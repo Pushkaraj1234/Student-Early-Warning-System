@@ -1,0 +1,6 @@
+{
+  "name": "Student Early Warning System",
+  "description": "AI/ML-powered academic early-warning, explainable risk prediction (SHAP), and intervention tracking system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
