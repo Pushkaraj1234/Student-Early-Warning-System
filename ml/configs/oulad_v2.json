@@ -1,0 +1,77 @@
+{
+  "run_name": "oulad-v2",
+  "dataset": {
+    "name": "OULAD",
+    "path": "ml/data/raw/oulad",
+    "provenance": "benchmark",
+    "description": "Open University Learning Analytics Dataset (United Kingdom, 2013-2014; CC BY 4.0; UCI id 349). NOT Indian data."
+  },
+  "feature_version": "oulad-fs-2.0.0",
+  "targets": [
+    "academic",
+    "dropout",
+    "course_failure",
+    "engagement"
+  ],
+  "primary_target": "academic",
+  "calibration_check": {
+    "train": [
+      "2013B"
+    ],
+    "calibrate": [
+      "2013J"
+    ],
+    "evaluate": [
+      "2014B"
+    ]
+  },
+  "cutoff_days": [
+    30,
+    60,
+    90
+  ],
+  "primary_cutoff_day": 60,
+  "score_release_lag_days": 14,
+  "split": {
+    "train": [
+      "2013B",
+      "2013J"
+    ],
+    "validation": [
+      "2014B"
+    ],
+    "test": [
+      "2014J"
+    ]
+  },
+  "models": [
+    "logistic_regression",
+    "random_forest",
+    "xgboost"
+  ],
+  "imbalance_strategies": [
+    "none",
+    "balanced"
+  ],
+  "calibration_method": "sigmoid",
+  "risk_level_quantiles": {
+    "watch": 0.5,
+    "elevated": 0.75,
+    "high": 0.9
+  },
+  "top_fractions": [
+    0.1,
+    0.2,
+    0.3
+  ],
+  "selection_tolerance_pr_auc": 0.01,
+  "stability_seeds": [
+    0,
+    1,
+    2
+  ],
+  "bootstrap_iterations": 300,
+  "random_seed": 20260924,
+  "output_dir": "ml/artifacts",
+  "report_dir": "ml/reports"
+}

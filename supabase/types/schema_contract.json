@@ -1,0 +1,1531 @@
+{
+    "rpc": {
+        "admin_set_user_role": {
+            "returns": "void",
+            "arguments": "p_user_id uuid, p_role text"
+        },
+        "assign_intervention": {
+            "returns": "void",
+            "arguments": "p_intervention_id uuid, p_assigned_to uuid"
+        },
+        "cancel_intervention": {
+            "returns": "void",
+            "arguments": "p_intervention_id uuid"
+        },
+        "complete_onboarding": {
+            "returns": "void",
+            "arguments": "p_privacy_notice_version text"
+        },
+        "create_intervention": {
+            "returns": "uuid",
+            "arguments": "p_student_id uuid, p_intervention_type text, p_reason text, p_priority text DEFAULT 'medium'::text, p_assigned_to uuid DEFAULT NULL::uuid, p_due_on date DEFAULT NULL::date, p_prediction_id uuid DEFAULT NULL::uuid"
+        },
+        "get_mentor_caseload": {
+            "returns": "TABLE(student_id uuid, full_name text, roll_number text, current_semester smallint, risk_level text, risk_probability numeric, trajectory text, risk_delta numeric, prediction_date date, data_provenance text, open_interventions integer)",
+            "arguments": ""
+        },
+        "send_mentor_message": {
+            "returns": "uuid",
+            "arguments": "p_student_id uuid, p_body text"
+        },
+        "claim_student_record": {
+            "returns": "uuid",
+            "arguments": ""
+        },
+        "complete_intervention": {
+            "returns": "void",
+            "arguments": "p_intervention_id uuid, p_outcome text"
+        },
+        "get_platform_versions": {
+            "returns": "TABLE(component text, version text)",
+            "arguments": ""
+        },
+        "approve_recommendation": {
+            "returns": "void",
+            "arguments": "p_intervention_id uuid, p_assigned_to uuid DEFAULT NULL::uuid"
+        },
+        "acknowledge_drift_alert": {
+            "returns": "void",
+            "arguments": "p_alert_id uuid"
+        },
+        "respond_to_intervention": {
+            "returns": "void",
+            "arguments": "p_intervention_id uuid, p_accept boolean, p_decline_reason text DEFAULT NULL::text"
+        },
+        "get_student_weekly_trends": {
+            "returns": "TABLE(week_start date, attendance_attended integer, attendance_counted integer, assignments_due integer, assignments_submitted integer, mean_score_pct numeric, engagement_events integer, quiz_attempts integer)",
+            "arguments": "p_student_id uuid, p_weeks integer DEFAULT 12"
+        },
+        "get_my_recommended_actions": {
+            "returns": "TABLE(id uuid, intervention_type text, status text, due_on date, prediction_id uuid, created_at timestamp with time zone)",
+            "arguments": ""
+        }
+    },
+    "tables": {
+        "courses": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "department_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "programme_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "code",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "title",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "credits",
+                "type": "numeric",
+                "nullable": false
+            },
+            {
+                "name": "semester_number",
+                "type": "smallint",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "profiles": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "role",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "full_name",
+                "type": "text",
+                "nullable": true
+            },
+            {
+                "name": "onboarding_completed_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "privacy_notice_version",
+                "type": "text",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "students": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "programme_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "user_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "roll_number",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "full_name",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "institutional_email",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "admission_year",
+                "type": "smallint",
+                "nullable": false
+            },
+            {
+                "name": "current_semester",
+                "type": "smallint",
+                "nullable": false
+            },
+            {
+                "name": "status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "audit_logs": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "actor_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "action",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "table_name",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "record_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "changed_columns",
+                "type": "ARRAY",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "programmes": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "department_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "code",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "name",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "degree_level",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "duration_semesters",
+                "type": "smallint",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "assignments": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "course_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "academic_year",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "title",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "max_score",
+                "type": "numeric",
+                "nullable": false
+            },
+            {
+                "name": "due_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "created_by",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "departments": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "code",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "name",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "drift_alerts": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "model_registry_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "monitoring_snapshot_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "alert_type",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "subject",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "statistic",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "value",
+                "type": "numeric",
+                "nullable": false
+            },
+            {
+                "name": "threshold",
+                "type": "numeric",
+                "nullable": false
+            },
+            {
+                "name": "severity",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "acknowledged_by",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "acknowledged_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "institutions": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "code",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "name",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "risk_factors": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "prediction_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "rank",
+                "type": "smallint",
+                "nullable": false
+            },
+            {
+                "name": "feature",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "feature_value",
+                "type": "numeric",
+                "nullable": true
+            },
+            {
+                "name": "contribution",
+                "type": "numeric",
+                "nullable": false
+            },
+            {
+                "name": "direction",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "interventions": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "prediction_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "intervention_type",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "source",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "created_by",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "assigned_to",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "due_on",
+                "type": "date",
+                "nullable": true
+            },
+            {
+                "name": "notes",
+                "type": "text",
+                "nullable": true
+            },
+            {
+                "name": "outcome",
+                "type": "text",
+                "nullable": true
+            },
+            {
+                "name": "completed_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "reason",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "priority",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "rule_id",
+                "type": "text",
+                "nullable": true
+            },
+            {
+                "name": "reviewed_by",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "reviewed_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "assigned_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "offered_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "responded_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "cancelled_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "decline_reason",
+                "type": "text",
+                "nullable": true
+            }
+        ],
+        "notifications": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "recipient_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "notification_type",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "title",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "body",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "read_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "preview",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "sender_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "delivery_status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "delivery_attempts",
+                "type": "integer",
+                "nullable": false
+            },
+            {
+                "name": "last_delivery_error",
+                "type": "text",
+                "nullable": true
+            },
+            {
+                "name": "delivered_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            }
+        ],
+        "system_events": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "occurred_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "component",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "event_type",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "severity",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "details",
+                "type": "jsonb",
+                "nullable": false
+            }
+        ],
+        "academic_terms": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "academic_year",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "term",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "starts_on",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "ends_on",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "course_faculty": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "course_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "faculty_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "model_registry": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "model_name",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "version",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "target",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "dataset_version",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "feature_version",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "data_provenance",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "training_timestamp",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "validation_metrics",
+                "type": "jsonb",
+                "nullable": false
+            },
+            {
+                "name": "calibration_metrics",
+                "type": "jsonb",
+                "nullable": false
+            },
+            {
+                "name": "status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "artifact_sha256",
+                "type": "text",
+                "nullable": true
+            },
+            {
+                "name": "approved_by",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "approved_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "status_changed_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "student_courses": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "course_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "academic_year",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "semester",
+                "type": "smallint",
+                "nullable": false
+            },
+            {
+                "name": "status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "marks",
+                "type": "numeric",
+                "nullable": true
+            },
+            {
+                "name": "grade",
+                "type": "text",
+                "nullable": true
+            },
+            {
+                "name": "grade_points",
+                "type": "smallint",
+                "nullable": true
+            },
+            {
+                "name": "result_published_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "academic_records": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "academic_year",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "semester",
+                "type": "smallint",
+                "nullable": false
+            },
+            {
+                "name": "sgpa",
+                "type": "numeric",
+                "nullable": true
+            },
+            {
+                "name": "cgpa",
+                "type": "numeric",
+                "nullable": true
+            },
+            {
+                "name": "credits_registered",
+                "type": "numeric",
+                "nullable": false
+            },
+            {
+                "name": "credits_earned",
+                "type": "numeric",
+                "nullable": false
+            },
+            {
+                "name": "result_status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "published_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "lms_integrations": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "provider",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "display_name",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "risk_predictions": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "prediction_date",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "risk_probability",
+                "type": "numeric",
+                "nullable": false
+            },
+            {
+                "name": "risk_level",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "model_version",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "feature_version",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "dataset_version",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "data_provenance",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "target",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "scored_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "previous_prediction_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "risk_delta",
+                "type": "numeric",
+                "nullable": true
+            },
+            {
+                "name": "days_since_previous",
+                "type": "integer",
+                "nullable": true
+            },
+            {
+                "name": "risk_velocity_per_week",
+                "type": "numeric",
+                "nullable": true
+            },
+            {
+                "name": "trajectory",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "model_registry_id",
+                "type": "uuid",
+                "nullable": true
+            }
+        ],
+        "student_checkins": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "support_needs",
+                "type": "ARRAY",
+                "nullable": false
+            },
+            {
+                "name": "wants_contact",
+                "type": "boolean",
+                "nullable": false
+            },
+            {
+                "name": "comment",
+                "type": "text",
+                "nullable": true
+            },
+            {
+                "name": "submitted_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "engagement_events": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "course_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "event_type",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "event_count",
+                "type": "integer",
+                "nullable": false
+            },
+            {
+                "name": "source",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "occurred_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "recorded_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "integration_id",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "external_event_hash",
+                "type": "text",
+                "nullable": true
+            }
+        ],
+        "attendance_records": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_course_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "course_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "attendance_date",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "session_number",
+                "type": "smallint",
+                "nullable": false
+            },
+            {
+                "name": "status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "recorded_by",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "recorded_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "mentor_assignments": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "institution_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "mentor_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "starts_on",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "ends_on",
+                "type": "date",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "assignment_submissions": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "assignment_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "student_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "status",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "submitted_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "score",
+                "type": "numeric",
+                "nullable": true
+            },
+            {
+                "name": "graded_at",
+                "type": "timestamp with time zone",
+                "nullable": true
+            },
+            {
+                "name": "recorded_by",
+                "type": "uuid",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            },
+            {
+                "name": "updated_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "model_monitoring_snapshots": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "model_registry_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "window_start",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "window_end",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "n_predictions",
+                "type": "integer",
+                "nullable": false
+            },
+            {
+                "name": "level_distribution",
+                "type": "jsonb",
+                "nullable": false
+            },
+            {
+                "name": "probability_quantiles",
+                "type": "jsonb",
+                "nullable": false
+            },
+            {
+                "name": "feature_stats",
+                "type": "jsonb",
+                "nullable": false
+            },
+            {
+                "name": "labels_available",
+                "type": "integer",
+                "nullable": false
+            },
+            {
+                "name": "performance",
+                "type": "jsonb",
+                "nullable": true
+            },
+            {
+                "name": "created_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ],
+        "intervention_outcome_measures": [
+            {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "intervention_id",
+                "type": "uuid",
+                "nullable": false
+            },
+            {
+                "name": "indicator",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "baseline_value",
+                "type": "numeric",
+                "nullable": true
+            },
+            {
+                "name": "followup_value",
+                "type": "numeric",
+                "nullable": true
+            },
+            {
+                "name": "baseline_start",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "baseline_end",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "followup_start",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "followup_end",
+                "type": "date",
+                "nullable": false
+            },
+            {
+                "name": "method_version",
+                "type": "text",
+                "nullable": false
+            },
+            {
+                "name": "computed_at",
+                "type": "timestamp with time zone",
+                "nullable": false
+            }
+        ]
+    },
+    "generated_from": "supabase/migrations (verified by scripts/db/test-local.sh)"
+}

@@ -1,0 +1,35 @@
+[project]
+name = "sews-ml"
+version = "1.0.0"
+description = "SEWS baseline early-warning ML pipeline (research-grade; benchmark data only in v1)"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["ml/tests"]
+addopts = "-q -p no:cacheprovider"
+filterwarnings = [
+  "error::FutureWarning:ml.*",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+extend-exclude = [".venv", "data", "artifacts", "reports"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "NPY", "PD"]
+ignore = [
+  "N803",   # sklearn convention: argument name `X`
+  "N806",   # sklearn convention: variable name `X`
+]
+
+[tool.mypy]
+strict = true
+python_version = "3.13"
+explicit_package_bases = true
+exclude = ['^ml/\.venv/', '^ml/data/', '^ml/artifacts/']
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["sklearn.*", "xgboost.*", "shap.*", "joblib.*"]
+ignore_missing_imports = true

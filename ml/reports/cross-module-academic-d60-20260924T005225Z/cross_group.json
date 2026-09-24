@@ -1,0 +1,264 @@
+{
+  "run_id": "cross-module-academic-d60-20260924T005225Z",
+  "created_at": "2026-09-24T00:52:25+00:00",
+  "scope": "Cross-MODULE proxy within ONE institution (Open University, UK). This is NOT cross-institution validation and does not show that any model generalises to other institutions or to Indian students.",
+  "dataset": {
+    "name": "OULAD",
+    "version": "oulad-f853d3b6b35de756",
+    "provenance": "benchmark"
+  },
+  "feature_version": "oulad-fs-2.0.0",
+  "target": "academic",
+  "target_definition": "final_result is Fail or Withdrawn",
+  "cutoff_day": 60,
+  "model_name": "logistic_regression",
+  "train_groups": [
+    "2013B",
+    "2013J",
+    "2014B"
+  ],
+  "test_groups": [
+    "2014J"
+  ],
+  "groups_evaluated": 7,
+  "groups_skipped": 0,
+  "degradation_summary": {
+    "pr_auc": {
+      "mean": 0.01474918763207592,
+      "max": 0.044749629039290695,
+      "min": 0.00154846849692869
+    },
+    "roc_auc": {
+      "mean": 0.01136563693922383,
+      "max": 0.033347578077878914,
+      "min": 0.00034491254003454763
+    },
+    "brier": {
+      "mean": 0.021642390870041547,
+      "max": 0.06580407689221285,
+      "min": 0.0026628826875707
+    },
+    "ece": {
+      "mean": 0.045328519916516034,
+      "max": 0.1509067978057142,
+      "min": 0.004891860341986132
+    },
+    "recall_at_top_20pct": {
+      "mean": 0.0063004453859770715,
+      "max": 0.01963746223564955,
+      "min": -0.006791171477079805
+    }
+  },
+  "groups": [
+    {
+      "group": "AAA",
+      "n_eval": 340,
+      "skipped": false,
+      "reference": {
+        "pr_auc": 0.5563887522748909,
+        "roc_auc": 0.758302666848394,
+        "brier": 0.1929606502721578,
+        "ece": 0.1717903609853428,
+        "recall_at_top_20pct": 0.4367816091954023,
+        "prevalence": 0.25588235294117645,
+        "mean_predicted": 0.42767271392651934
+      },
+      "held_out": {
+        "pr_auc": 0.5521388054153029,
+        "roc_auc": 0.757893780382536,
+        "brier": 0.2087358287917048,
+        "ece": 0.21345596308341053,
+        "recall_at_top_20pct": 0.42528735632183906,
+        "prevalence": 0.25588235294117645,
+        "mean_predicted": 0.4693383160245869
+      },
+      "degradation": {
+        "pr_auc": 0.004249946859588016,
+        "roc_auc": 0.000408886465858016,
+        "brier": 0.01577517851954699,
+        "ece": 0.04166560209806772,
+        "recall_at_top_20pct": 0.01149425287356326
+      }
+    },
+    {
+      "group": "BBB",
+      "n_eval": 1741,
+      "skipped": false,
+      "reference": {
+        "pr_auc": 0.5931723674753683,
+        "roc_auc": 0.6825657894736842,
+        "brier": 0.3274132258711219,
+        "ece": 0.3195926815249054,
+        "recall_at_top_20pct": 0.3599320882852292,
+        "prevalence": 0.3383113153360138,
+        "mean_predicted": 0.4237024767399165
+      },
+      "held_out": {
+        "pr_auc": 0.5906613047008888,
+        "roc_auc": 0.6805761884550086,
+        "brier": 0.33261877786124205,
+        "ece": 0.3244845418668915,
+        "recall_at_top_20pct": 0.366723259762309,
+        "prevalence": 0.3383113153360138,
+        "mean_predicted": 0.43635993591356936
+      },
+      "degradation": {
+        "pr_auc": 0.0025110627744794334,
+        "roc_auc": 0.001989601018675624,
+        "brier": 0.0052055519901201275,
+        "ece": 0.004891860341986132,
+        "recall_at_top_20pct": -0.006791171477079805
+      }
+    },
+    {
+      "group": "CCC",
+      "n_eval": 1859,
+      "skipped": false,
+      "reference": {
+        "pr_auc": 0.785225133436162,
+        "roc_auc": 0.8003618705203931,
+        "brier": 0.1875312988982639,
+        "ece": 0.07676145999847957,
+        "recall_at_top_20pct": 0.3803317535545024,
+        "prevalence": 0.45400753093060786,
+        "mean_predicted": 0.5304706650252234
+      },
+      "held_out": {
+        "pr_auc": 0.7404755043968713,
+        "roc_auc": 0.7687413909835874,
+        "brier": 0.20853413174685986,
+        "ece": 0.083195776957708,
+        "recall_at_top_20pct": 0.3613744075829384,
+        "prevalence": 0.45400753093060786,
+        "mean_predicted": 0.5212197503749562
+      },
+      "degradation": {
+        "pr_auc": 0.044749629039290695,
+        "roc_auc": 0.03162047953680569,
+        "brier": 0.02100283284859597,
+        "ece": 0.006434316959228428,
+        "recall_at_top_20pct": 0.01895734597156401
+      }
+    },
+    {
+      "group": "DDD",
+      "n_eval": 1407,
+      "skipped": false,
+      "reference": {
+        "pr_auc": 0.8039246083664875,
+        "roc_auc": 0.8227765459472776,
+        "brier": 0.18065301655567845,
+        "ece": 0.09244418451769584,
+        "recall_at_top_20pct": 0.3967479674796748,
+        "prevalence": 0.43710021321961623,
+        "mean_predicted": 0.34465602870192036
+      },
+      "held_out": {
+        "pr_auc": 0.8023761398695588,
+        "roc_auc": 0.822431633407243,
+        "brier": 0.18331589924324915,
+        "ece": 0.10118112820165004,
+        "recall_at_top_20pct": 0.3934959349593496,
+        "prevalence": 0.43710021321961623,
+        "mean_predicted": 0.33591908501796613
+      },
+      "degradation": {
+        "pr_auc": 0.00154846849692869,
+        "roc_auc": 0.00034491254003454763,
+        "brier": 0.0026628826875707,
+        "ece": 0.008736943683954196,
+        "recall_at_top_20pct": 0.0032520325203251876
+      }
+    },
+    {
+      "group": "EEE",
+      "n_eval": 995,
+      "skipped": false,
+      "reference": {
+        "pr_auc": 0.7687205509004712,
+        "roc_auc": 0.8378274195671386,
+        "brier": 0.15116121902852703,
+        "ece": 0.11383223052770802,
+        "recall_at_top_20pct": 0.5112540192926045,
+        "prevalence": 0.31256281407035175,
+        "mean_predicted": 0.4255532465715654
+      },
+      "held_out": {
+        "pr_auc": 0.7647658771035007,
+        "roc_auc": 0.8346025836294917,
+        "brier": 0.21696529592073988,
+        "ece": 0.2647390283334222,
+        "recall_at_top_20pct": 0.5176848874598071,
+        "prevalence": 0.31256281407035175,
+        "mean_predicted": 0.5773018424037739
+      },
+      "degradation": {
+        "pr_auc": 0.003954673796970454,
+        "roc_auc": 0.003224835937646886,
+        "brier": 0.06580407689221285,
+        "ece": 0.1509067978057142,
+        "recall_at_top_20pct": -0.006430868167202619
+      }
+    },
+    {
+      "group": "FFF",
+      "n_eval": 1779,
+      "skipped": false,
+      "reference": {
+        "pr_auc": 0.7842426499660542,
+        "roc_auc": 0.8263894711503352,
+        "brier": 0.1589254423730328,
+        "ece": 0.06089897983108296,
+        "recall_at_top_20pct": 0.45468277945619334,
+        "prevalence": 0.37211916807195056,
+        "mean_predicted": 0.42578813617654243
+      },
+      "held_out": {
+        "pr_auc": 0.7526341339407978,
+        "roc_auc": 0.7930418930724563,
+        "brier": 0.19079680154516881,
+        "ece": 0.12805777986253722,
+        "recall_at_top_20pct": 0.4350453172205438,
+        "prevalence": 0.37211916807195056,
+        "mean_predicted": 0.24908029162807704
+      },
+      "degradation": {
+        "pr_auc": 0.031608516025256383,
+        "roc_auc": 0.033347578077878914,
+        "brier": 0.031871359172136016,
+        "ece": 0.06715880003145426,
+        "recall_at_top_20pct": 0.01963746223564955
+      }
+    },
+    {
+      "group": "GGG",
+      "n_eval": 695,
+      "skipped": false,
+      "reference": {
+        "pr_auc": 0.7002158265257878,
+        "roc_auc": 0.7721411650694521,
+        "brier": 0.1741633563745899,
+        "ece": 0.03877147069061721,
+        "recall_at_top_20pct": 0.43824701195219123,
+        "prevalence": 0.36115107913669064,
+        "mean_predicted": 0.36857505912989197
+      },
+      "held_out": {
+        "pr_auc": 0.6855938100937701,
+        "roc_auc": 0.7635180000717849,
+        "brier": 0.18333821035469808,
+        "ece": 0.07627678918582455,
+        "recall_at_top_20pct": 0.4342629482071713,
+        "prevalence": 0.36115107913669064,
+        "mean_predicted": 0.43345221906448983
+      },
+      "degradation": {
+        "pr_auc": 0.01462201643201777,
+        "roc_auc": 0.008623164997667132,
+        "brier": 0.009174853980108172,
+        "ece": 0.037505318495207336,
+        "recall_at_top_20pct": 0.003984063745019917
+      }
+    }
+  ]
+}

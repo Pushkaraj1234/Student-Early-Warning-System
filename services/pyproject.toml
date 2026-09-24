@@ -1,0 +1,36 @@
+[project]
+name = "sews-services"
+version = "1.0.0"
+description = "SEWS backend services: LMS ingestion, scoring, recommendations, outcomes, monitoring, notifications, inference API"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["services/tests"]
+pythonpath = ["services", "."]
+addopts = "-q -p no:cacheprovider"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "S", "PD"]
+ignore = [
+  "N803", "N806",  # sklearn convention: X
+]
+
+[tool.ruff.lint.per-file-ignores]
+"services/tests/**" = ["S101", "S105", "S106", "S311"]  # asserts and fixed test secrets in tests
+
+[tool.mypy]
+strict = true
+python_version = "3.13"
+explicit_package_bases = true
+mypy_path = "services,."
+exclude = ['\.venv/', '^ml/']
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["sklearn.*", "xgboost.*", "shap.*", "joblib.*"]
+ignore_missing_imports = true

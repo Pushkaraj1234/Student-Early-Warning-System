@@ -1,0 +1,49 @@
+# --- Secrets (never commit) ---
+.env
+.env.*
+!.env.example
+*.local.json
+!*.example.json
+*.pem
+*.key
+service-account*.json
+
+# --- Data (never commit student data or large datasets) ---
+ml/data/raw/
+ml/data/processed/
+*.csv
+*.parquet
+!**/fixtures/**/*.csv
+
+# --- Model artifacts (tracked via model registry, not git) ---
+ml/artifacts/
+*.joblib
+*.pkl
+*.ubj
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Flutter / Dart ---
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+
+# --- Supabase CLI ---
+supabase/.branches/
+supabase/.temp/
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
