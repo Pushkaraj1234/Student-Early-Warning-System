@@ -109,10 +109,15 @@ void main() {
       await _pumpApp(tester, _emptyStudentBackend(), _signedIn);
       expect(find.text('No early-warning signal is available yet.'), findsOneWidget);
       expect(find.text('No recommended actions right now.'), findsOneWidget);
-      expect(find.text('No academic records yet.'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('No assignments yet.'), 200);
-      expect(find.text('No attendance has been recorded yet.'), findsOneWidget);
-      expect(find.text('No assignments yet.'), findsOneWidget);
+      // The dashboard is a lazy list: scroll each lower section into view before asserting it.
+      for (final message in [
+        'No academic records yet.',
+        'No attendance has been recorded yet.',
+        'No assignments yet.',
+      ]) {
+        await tester.scrollUntilVisible(find.text(message), 200);
+        expect(find.text(message), findsOneWidget);
+      }
     });
 
     testWidgets('network failure shows a friendly error with retry, then recovers', (tester) async {

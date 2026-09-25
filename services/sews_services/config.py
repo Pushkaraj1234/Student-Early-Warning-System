@@ -2,7 +2,7 @@
 
 Secrets are never logged, printed or written to files: ``Settings.__repr__`` hides them.
 
-Environment separation (docs/operations/environments.md):
+Environment separation (docs/architecture/environments.md):
   development  database must be on a loopback host (local Supabase / local Postgres). A development
                process can therefore never reach a hosted (staging or production) database.
   staging      hosted database that is NOT the production project.

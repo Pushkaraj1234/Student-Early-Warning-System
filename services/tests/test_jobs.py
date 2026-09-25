@@ -12,7 +12,7 @@ from typing import Any
 import psycopg
 import pytest
 from sews_services.db import Connection, connect, set_session_environment
-from sews_services.features.institutional import FEATURES
+from sews_services.features.institutional import DEFAULT_TZ, FEATURES
 from sews_services.jobs.monitoring import monitor_window
 from sews_services.jobs.notifications import (
     MAX_ATTEMPTS,
@@ -25,6 +25,7 @@ from sews_services.jobs.outcomes import compute_outcomes
 from sews_services.jobs.recommend import recommend_for_institution
 from sews_services.jobs.scoring import ScoringRefusedError, score_institution
 
+from ml.inference.schemas import API_VERSION
 from ml.models.artifact import ModelArtifact
 from ml.models.registry import ModelRegistry
 from tests.conftest import (
@@ -32,6 +33,7 @@ from tests.conftest import (
     BETA,
     GAMMA,
     INSTITUTION,
+    ROOT,
     dev_settings,
     register,
     train_institutional_model,
@@ -338,7 +340,7 @@ def test_outcome_measures_are_descriptive_windows(conn: Connection) -> None:
 
 # ------------------------------------------------------------------ monitoring
 def test_monitoring_snapshot_and_prediction_drift_alert(conn: Connection, scored: Any, model: dict[str, Any]) -> None:
-    today = NOW.date()
+    today = NOW.astimezone(DEFAULT_TZ).date()  # predictions are dated in the institution's time zone
     reference_day = date(2026, 8, 3)
     set_session_environment(conn, "development")
     for sid in (ALPHA, BETA, GAMMA):
@@ -462,3 +464,20 @@ def test_provider_exception_is_contained(conn: Connection) -> None:
     deliver_pending(conn, Broken())
     row = conn.execute("select * from public.notifications where id = %s", (nid,)).fetchone()
     assert row is not None and row["last_delivery_error"] == "unknown" and row["delivery_status"] == "pending"
+
+
+# ------------------------------------------------------------------ versions (docs/architecture/versioning.md)
+def test_published_versions_agree_with_the_code(conn: Connection) -> None:
+    rows = conn.execute("select component, version from public.get_platform_versions()").fetchall()
+    versions = {r["component"]: r["version"] for r in rows}
+    assert versions["inference_api"] == API_VERSION
+    pubspec = (ROOT / "apps/mobile/pubspec.yaml").read_text(encoding="utf-8")
+    app = next(
+        line.split(":", 1)[1].strip().split("+")[0] for line in pubspec.splitlines() if line.startswith("version:")
+    )
+
+    def parse(v: str) -> tuple[int, ...]:
+        return tuple(int(x) for x in v.split("."))
+
+    # the database must never demand a newer app than the one in this repository
+    assert parse(versions["minimum_mobile_app"]) <= parse(app)

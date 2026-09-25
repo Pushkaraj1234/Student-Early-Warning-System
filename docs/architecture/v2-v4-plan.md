@@ -80,9 +80,18 @@ Note: migrations are idempotent but do not repair manual drift (a hand-dropped i
 - [x] FastAPI inference API (JWT HS256/JWKS, role check, rate limiting, body limit, stable errors, metrics, no PII logs), environment-safety config
 - Services suite 2026-09-24: 101 tests pass (39 against a rebuilt local DB); ruff clean; mypy --strict clean (28 files)
 ### Mobile
-- [ ] Mentor role: dashboard, student detail (trends, trajectory, factors, interventions), intervention actions, messages
-- [ ] Student: offered interventions accept/decline, check-ins, trajectory, realtime notifications
-- [ ] Admin: model/monitoring view
+- [x] Mentor role: dashboard, student detail (trends, trajectory, factors, interventions), intervention actions, messages
+- [x] Student: offered interventions accept/decline, check-ins, trajectory, realtime notifications (Realtime not exercised in tests: no socket in widget tests)
+- [x] Admin: model/monitoring view; role routing; minimum-version gate (app 2.0.0)
+- Mobile 2026-09-25: flutter analyze clean; 102 tests pass (incl. 9 V2 widget tests); debug APK built
 ### Docs & verification
 - [ ] Federated-learning design (no prototype unless justified), backups, environments, versioning, security review
+- [x] Docs referenced by code written 2026-09-25: docs/ml/risk-trajectory.md, docs/ml/monitoring.md,
+      docs/ml/intervention-outcomes.md, docs/architecture/versioning.md, docs/architecture/environments.md (owner chose
+      this path; config.py reference corrected). Mobile dev example config now points at the local stack.
+- [ ] Rules version not stored with interventions (docs/architecture/versioning.md "Known gap") — needs a migration
+- [ ] No scheduler / CLI runs the jobs (scoring, recommend, outcomes, monitoring, delivery) — owner decides where
+- [x] Security checks 2026-09-25: pip-audit (services + ml locks) no known vulns; OSV (106 hosted pub packages) no known
+      vulns, checker positive-controlled; 27/27 public tables have RLS; 0 client grants on private schema; 0 anon EXECUTE on
+      public functions; all SECURITY DEFINER functions pin search_path; no string-built SQL in services/ml
 - [ ] All test suites + builds; production-readiness report

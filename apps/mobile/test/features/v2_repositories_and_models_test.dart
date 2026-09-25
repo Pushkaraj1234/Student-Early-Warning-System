@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -37,6 +38,11 @@ void main() {
       expect(isVersionSupported('2.0.0+7', '2.0.1'), isFalse);
       expect(isVersionSupported('2.0.0', 'not-a-version'), isTrue); // a bad minimum never locks users out
       expect(isVersionSupported('garbage', '1.0.0'), isFalse);
+    });
+
+    test('appVersion matches the version in pubspec.yaml', () {
+      final line = File('pubspec.yaml').readAsLinesSync().firstWhere((l) => l.startsWith('version:'));
+      expect(line.substring('version:'.length).trim().split('+').first, appVersion);
     });
   });
 

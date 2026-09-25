@@ -110,6 +110,8 @@ def monitor_window(
     window: tuple[date, date],
     reference: tuple[date, date] | None = None,
 ) -> MonitoringResult:
+    """``window`` and ``reference`` are inclusive ranges of prediction dates, which the scoring job
+    records in the institution's local time zone; callers must derive them in that zone too."""
     model = conn.execute(
         "select id::text as id, feature_version, validation_metrics, institution_id::text as institution_id "
         "from public.model_registry where id = %s",

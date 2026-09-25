@@ -80,17 +80,19 @@ The local test cluster used here listens on port 54330 (`initdb` + `pg_ctl`, see
 |---|---|---|---|
 | `SUPABASE_URL` | mobile | no | `apps/mobile/config/dev.local.json` |
 | `SUPABASE_PUBLISHABLE_KEY` | mobile | no (RLS-protected) | `apps/mobile/config/dev.local.json` (git-ignored). The app **refuses** `sb_secret_…` and service-role keys |
-| `SUPABASE_SECRET_KEY` | future scoring job only | **YES** | server secret store — never Flutter, never Git |
+| `SEWS_ENV`, `SEWS_DATABASE_URL`, `SEWS_JWT_SECRET` / `SEWS_JWT_JWKS_URL`, … | backend services | database URL and JWT secret: **YES** | server secret store — never Flutter, never Git. Full list and rules: `docs/architecture/environments.md` |
 | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD` | Supabase CLI | **YES** | developer shell / CI secrets |
 | `PGBIN`, `PGHOST`, `PGPORT`, `PGUSER`, `SEWS_TEST_DB` | `scripts/db/*.sh` | no | shell |
 
 ## Testing
 
-| Layer | Command | Result (2026-09-24) |
+| Layer | Command | Result (2026-09-25) |
 |---|---|---|
-| Database | `bash scripts/db/test-local.sh` | 10 files, 242 assertions passed |
-| ML | `ml/.venv/Scripts/python -m pytest -c ml/pyproject.toml ml/tests` · `ruff check` · `mypy --strict` | 87 passed · clean · clean |
-| Mobile | `flutter analyze` · `flutter test` · `flutter build apk --debug` | no issues · 75 passed · built |
+| Database | `bash scripts/db/test-local.sh` | 13 files, 377 assertions passed |
+| ML | `ml/.venv/Scripts/python -m pytest -c ml/pyproject.toml ml/tests` · `ruff check` · `mypy --strict` | 133 passed · clean · clean |
+| Services | `services/.venv/Scripts/python -m pytest -c services/pyproject.toml services/tests` · `ruff` · `mypy --strict` | 102 passed (39 against a rebuilt local DB) · clean · clean |
+| Mobile | `flutter analyze` · `flutter test` · `flutter build apk --debug` | no issues · 103 passed · built (2026-09-25) |
+| Dependencies | `pip-audit -r services/requirements.lock` / `ml/requirements.lock` · `python scripts/security/osv_check_pub.py apps/mobile/pubspec.lock` | no known vulnerabilities (106 Dart packages) |
 
 ## Verification status
 
