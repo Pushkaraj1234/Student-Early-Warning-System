@@ -114,13 +114,22 @@ final notificationsRealtimeProvider = Provider<void>((ref) {
 
 // ------------------------------------------------------------------ mentor
 
-final caseloadProvider = FutureProvider<List<CaseloadEntry>>(
-  (ref) => ref.watch(mentorRepositoryProvider).fetchCaseload(),
-);
+/// Staff data carries no user id in its query (RLS scopes it to the caller), so it must watch
+/// the signed-in user explicitly; otherwise a sign-out followed by another sign-in in the same
+/// app process would show the previous user's cached caseload.
+void _requireSignedIn(Ref ref) {
+  if (ref.watch(currentUserIdProvider) == null) throw const AppFailure(FailureKind.unauthenticated);
+}
 
-final mentorInterventionsProvider = FutureProvider<List<StaffIntervention>>(
-  (ref) => ref.watch(mentorRepositoryProvider).fetchInterventions(),
-);
+final caseloadProvider = FutureProvider<List<CaseloadEntry>>((ref) {
+  _requireSignedIn(ref);
+  return ref.watch(mentorRepositoryProvider).fetchCaseload();
+});
+
+final mentorInterventionsProvider = FutureProvider<List<StaffIntervention>>((ref) {
+  _requireSignedIn(ref);
+  return ref.watch(mentorRepositoryProvider).fetchInterventions();
+});
 
 /// One mentee: only students in the caller's caseload can be opened (RLS decides the caseload).
 final menteeDetailProvider = FutureProvider.family<MenteeDetail, String>((ref, studentId) async {
@@ -138,6 +147,7 @@ final menteeDetailProvider = FutureProvider.family<MenteeDetail, String>((ref, s
 
 // ------------------------------------------------------------------ admin
 
-final adminOverviewProvider = FutureProvider<AdminOverview>(
-  (ref) => ref.watch(adminRepositoryProvider).fetchOverview(),
-);
+final adminOverviewProvider = FutureProvider<AdminOverview>((ref) {
+  _requireSignedIn(ref);
+  return ref.watch(adminRepositoryProvider).fetchOverview();
+});
