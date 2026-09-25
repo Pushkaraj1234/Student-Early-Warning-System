@@ -73,6 +73,21 @@ void main() {
       await expectLater(repo.signIn(email: testEmail, password: 'x'), throwsA(_failure(FailureKind.network)));
     });
 
+    test('registration refused by the project email service gets a specific message', () async {
+      for (final (code, kind) in [
+        ('email_address_not_authorized', FailureKind.emailDeliveryUnavailable),
+        ('email_address_invalid', FailureKind.emailNotAccepted),
+        ('signup_disabled', FailureKind.signupsClosed),
+      ]) {
+        backend.on('POST', signupPath, (_) => authError(code));
+        await expectLater(
+          AuthRepository(backend.client.auth).signUp(fullName: 'Synthetic Beta', email: testEmail, password: 'Valid1Password'),
+          throwsA(_failure(kind)),
+          reason: code,
+        );
+      }
+    });
+
     test('registration without a session requires email confirmation and never sends a role', () async {
       backend.on('POST', signupPath, (_) => jsonResponse(userJson(testUserId, testEmail, confirmed: false)));
       final result = await AuthRepository(backend.client.auth)

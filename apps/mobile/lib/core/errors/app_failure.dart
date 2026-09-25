@@ -15,6 +15,10 @@ enum FailureKind {
   weakPassword,
   rateLimited,
   emailInUse,
+  emailNotAccepted,
+  emailDeliveryUnavailable,
+  signupsClosed,
+  samePassword,
   noStudentRecord,
   notStudent,
   conflict,
@@ -46,6 +50,12 @@ class AppFailure implements Exception {
           'Choose a stronger password: at least 8 characters with upper- and lower-case letters and a number.',
         FailureKind.rateLimited => 'Too many attempts. Please wait a few minutes and try again.',
         FailureKind.emailInUse => 'An account with this email already exists. Try signing in instead.',
+        FailureKind.emailNotAccepted =>
+          'This email address is not accepted. Check it for typos and use your institutional email address.',
+        FailureKind.emailDeliveryUnavailable =>
+          "We can't send a confirmation email to this address yet. Please contact your institution's SEWS administrator.",
+        FailureKind.signupsClosed => 'New registrations are closed. Please contact your institution.',
+        FailureKind.samePassword => 'Choose a new password that is different from your current one.',
         FailureKind.noStudentRecord =>
           "We couldn't find a student record for your email address. Please contact your institution.",
         FailureKind.notStudent => 'This app is for students. Staff accounts are not supported yet.',
@@ -95,6 +105,19 @@ class AppFailure implements Exception {
       case 'user_already_exists':
       case 'email_exists':
         return const AppFailure(FailureKind.emailInUse);
+      // The codes below are listed in Supabase's Auth error-code documentation
+      // (supabase.com/docs/guides/auth/debugging/error-codes).
+      case 'email_address_invalid':
+        return const AppFailure(FailureKind.emailNotAccepted);
+      case 'email_address_not_authorized':
+        return const AppFailure(FailureKind.emailDeliveryUnavailable);
+      case 'signup_disabled':
+      case 'email_provider_disabled':
+        return const AppFailure(FailureKind.signupsClosed);
+      case 'same_password':
+        return const AppFailure(FailureKind.samePassword);
+      case 'validation_failed':
+        return const AppFailure(FailureKind.invalidInput);
       case 'session_not_found':
       case 'session_expired':
       case 'refresh_token_not_found':

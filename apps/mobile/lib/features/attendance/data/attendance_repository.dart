@@ -40,8 +40,8 @@ class AttendanceRepository {
                 .select(AttendanceRecord.columns)
                 .eq('student_id', studentId)
                 .inFilter('student_course_id', ids)
-                .order('attendance_date')
-                .order('id')
+                .order('attendance_date', ascending: true)
+                .order('id', ascending: true)
                 .range(offset, offset + pageSize - 1),
           ).map(AttendanceRecord.fromJson);
           records.addAll(page);

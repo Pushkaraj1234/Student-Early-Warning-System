@@ -61,6 +61,30 @@ void main() {
           FailureKind.rateLimited);
     });
 
+    test('sign-up and password errors from the Auth error-code list get specific messages', () {
+      const expected = {
+        'email_address_invalid': FailureKind.emailNotAccepted,
+        'email_address_not_authorized': FailureKind.emailDeliveryUnavailable,
+        'signup_disabled': FailureKind.signupsClosed,
+        'email_provider_disabled': FailureKind.signupsClosed,
+        'same_password': FailureKind.samePassword,
+        'validation_failed': FailureKind.invalidInput,
+        'user_already_exists': FailureKind.emailInUse,
+        'email_exists': FailureKind.emailInUse,
+        'over_request_rate_limit': FailureKind.rateLimited,
+      };
+      for (final entry in expected.entries) {
+        final failure = AppFailure.from(AuthApiException('server text', code: entry.key, statusCode: '400'));
+        expect(failure.kind, entry.value, reason: entry.key);
+        expect(failure.message, isNot(contains('server text')), reason: 'never echoes server text');
+      }
+    });
+
+    test('an unrecognised auth code still falls back to the generic message', () {
+      expect(AppFailure.from(const AuthApiException('x', code: 'brand_new_code', statusCode: '400')).kind,
+          FailureKind.unknown);
+    });
+
     test('database errors', () {
       expect(AppFailure.from(const PostgrestException(message: 'sews:no_matching_student_record', code: 'P0001')).kind,
           FailureKind.noStudentRecord);

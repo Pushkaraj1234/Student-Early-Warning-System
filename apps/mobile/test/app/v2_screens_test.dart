@@ -113,6 +113,8 @@ void main() {
       expect(find.textContaining('Attendance in the last 14 days'), findsWidgets);
       expect(find.textContaining('associations, not causes'), findsOneWidget);
       expect(find.textContaining('Demonstration signal'), findsOneWidget); // synthetic provenance is disclosed
+      expect(find.textContaining("does not describe this student's situation"), findsOneWidget); // staff wording
+      expect(find.textContaining('your situation'), findsNothing);
 
       await tester.tap(find.text('Review & offer'));
       await tester.pumpAndSettle();

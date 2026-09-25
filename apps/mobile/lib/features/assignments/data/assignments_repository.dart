@@ -12,7 +12,7 @@ class AssignmentsRepository {
   /// student's own submissions are filtered explicitly and by RLS.
   Future<(List<Assignment>, List<Submission>)> fetch(String studentId) => guard(() async {
         final results = await Future.wait([
-          _client.from('assignments').select(Assignment.columns).order('due_at'),
+          _client.from('assignments').select(Assignment.columns).order('due_at', ascending: true),
           _client.from('assignment_submissions').select(Submission.columns).eq('student_id', studentId),
         ]);
         return (

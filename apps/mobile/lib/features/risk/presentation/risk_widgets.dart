@@ -64,22 +64,25 @@ class RiskLevelBadge extends StatelessWidget {
 
 /// Explains when a signal does not come from a model validated on institutional data.
 class ProvenanceNotice extends StatelessWidget {
-  const ProvenanceNotice({super.key, required this.provenance});
+  const ProvenanceNotice({super.key, required this.provenance, this.forStaff = false});
 
   final DataProvenance provenance;
 
-  static String? messageFor(DataProvenance provenance) => switch (provenance) {
+  /// Students are addressed directly ("your"); staff read about "this student".
+  static String? messageFor(DataProvenance provenance, {bool forStaff = false}) => switch (provenance) {
         DataProvenance.institutional => null,
         DataProvenance.benchmark =>
           'Demonstration signal: produced by a model trained on public benchmark data that has not '
-              'been validated for your institution.',
-        DataProvenance.synthetic =>
-          'Demonstration signal: produced from synthetic test data. It does not describe your situation.',
+              'been validated for ${forStaff ? 'this' : 'your'} institution.',
+        DataProvenance.synthetic => 'Demonstration signal: produced from synthetic test data. It does not describe '
+            '${forStaff ? "this student's" : 'your'} situation.',
       };
+
+  final bool forStaff;
 
   @override
   Widget build(BuildContext context) {
-    final message = messageFor(provenance);
+    final message = messageFor(provenance, forStaff: forStaff);
     if (message == null) return const SizedBox.shrink();
     final scheme = Theme.of(context).colorScheme;
     return Container(

@@ -50,7 +50,9 @@ void main() {
       expect(predictionQuery['student_id'], 'eq.$testStudentId');
       expect(predictionQuery['target'], 'eq.academic');  // other targets are separate models
       expect(predictionQuery['order'], 'prediction_date.desc.nullslast,created_at.desc.nullslast');
-      expect(backend.requestsTo(rest('risk_factors')).single.url.queryParameters['prediction_id'], 'eq.p1');
+      final factorQuery = backend.requestsTo(rest('risk_factors')).single.url.queryParameters;
+      expect(factorQuery['prediction_id'], 'eq.p1');
+      expect(factorQuery['order'], 'rank.asc.nullslast'); // most influential first; postgrest defaults to desc
     });
 
     test('risk: no predictions means no factor request (prediction unavailable)', () async {

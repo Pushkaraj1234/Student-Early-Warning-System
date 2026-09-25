@@ -29,7 +29,7 @@ class RiskRepository {
               .from('risk_factors')
               .select(RiskFactor.columns)
               .eq('prediction_id', history.first.id)
-              .order('rank'),
+              .order('rank', ascending: true),
         ).map(RiskFactor.fromJson).toList();
         return RiskOverview(history: history, latestFactors: factors);
       });

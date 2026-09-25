@@ -123,7 +123,7 @@ class _Header extends StatelessWidget {
                 RiskTrendRow(overview: detail.risk),
                 if (latest.provenance != DataProvenance.institutional) ...[
                   const SizedBox(height: 8),
-                  ProvenanceNotice(provenance: latest.provenance),
+                  ProvenanceNotice(provenance: latest.provenance, forStaff: true),
                 ],
               ],
             ),
