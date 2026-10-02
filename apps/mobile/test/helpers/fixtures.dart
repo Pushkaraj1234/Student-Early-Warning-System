@@ -128,7 +128,7 @@ Map<String, dynamic> notificationRow(String id, {bool read = false}) => {
     };
 
 List<Map<String, dynamic>> platformVersionRows({String minimumApp = '2.0.0'}) => [
-      {'component': 'database_schema', 'version': '4.0.0'},
+      {'component': 'database_schema', 'version': '4.1.0'},
       {'component': 'minimum_mobile_app', 'version': minimumApp},
       {'component': 'inference_api', 'version': '1.0.0'},
     ];

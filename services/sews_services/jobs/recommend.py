@@ -1,8 +1,9 @@
 """Recommendation job: gather each student's context, run the rule engine, store suggestions.
 
-Suggestions are stored with source 'model_rule' and status 'recommended'. The database refuses any
-other initial status for rule output, hides 'recommended' rows from students, and allows only one
-open intervention per type per student (``on conflict ... do nothing`` makes re-runs idempotent).
+Suggestions are stored with source 'model_rule', status 'recommended', the rule that fired and the
+rule-set version (RULES_VERSION). The database refuses any other initial status for rule output,
+requires the rule id and rule-set version together, hides 'recommended' rows from students, and allows
+only one open intervention per type per student (``on conflict ... do nothing`` makes re-runs idempotent).
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ from sews_services.features.institutional import DEFAULT_TZ, build_features, loa
 from sews_services.recommendations.engine import (
     COMPLETED_COOLDOWN_DAYS,
     DECLINE_RESPECT_DAYS,
+    RULES_VERSION,
     PredictionSignal,
     Recommendation,
     StudentContext,
@@ -29,8 +31,8 @@ CHECKIN_LOOKBACK_DAYS = 30
 
 INSERT_SQL = """
 insert into public.interventions
-  (student_id, prediction_id, intervention_type, status, source, reason, priority, rule_id)
-values (%s, %s, %s, 'recommended', 'model_rule', %s, %s, %s)
+  (student_id, prediction_id, intervention_type, status, source, reason, priority, rule_id, rule_version)
+values (%s, %s, %s, 'recommended', 'model_rule', %s, %s, %s, %s)
 on conflict (student_id, intervention_type) where status in ('recommended', 'pending', 'accepted')
 do nothing
 returning id
@@ -121,7 +123,7 @@ def _contexts(
 def store(conn: Connection, student_id: str, rec: Recommendation) -> bool:
     row = conn.execute(
         INSERT_SQL,
-        (student_id, rec.prediction_id, rec.intervention_type, rec.reason, rec.priority, rec.rule_id),
+        (student_id, rec.prediction_id, rec.intervention_type, rec.reason, rec.priority, rec.rule_id, RULES_VERSION),
     ).fetchone()
     return row is not None
 

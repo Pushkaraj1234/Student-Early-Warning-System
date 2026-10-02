@@ -73,7 +73,9 @@ def check_environment_safety(
             raise ConfigError("production may only allow models trained on institutional data")
 
 
-def load_settings(env: Mapping[str, str] | None = None) -> Settings:
+def load_settings(env: Mapping[str, str] | None = None, *, require_api_auth: bool = True) -> Settings:
+    """``require_api_auth=False`` is for the batch jobs (``python -m sews_services.jobs``): they verify no
+    caller tokens, so they do not need the API's JWT settings. Every other check still applies."""
     source = os.environ if env is None else env
     environment = source.get("SEWS_ENV", "")
     if environment not in ENVIRONMENTS:
@@ -95,7 +97,7 @@ def load_settings(env: Mapping[str, str] | None = None) -> Settings:
     )
     jwt_secret = source.get("SEWS_JWT_SECRET") or None
     jwks_url = source.get("SEWS_JWT_JWKS_URL") or None
-    if environment != "development" and not (jwt_secret or jwks_url):
+    if require_api_auth and environment != "development" and not (jwt_secret or jwks_url):
         raise ConfigError("SEWS_JWT_SECRET or SEWS_JWT_JWKS_URL is required outside development")
     if jwks_url and not jwks_url.startswith("https://"):
         raise ConfigError("SEWS_JWT_JWKS_URL must use https")

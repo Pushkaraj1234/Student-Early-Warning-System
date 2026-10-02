@@ -4,8 +4,9 @@ Status: statistics in `ml/monitoring/drift.py`; database job in `services/sews_s
 tables in migration `20260925001100_v4_registry_privacy_monitoring.sql`. Verified by `ml/tests/test_monitoring_and_fairness.py`,
 `services/tests/test_jobs.py` and `supabase/tests/database/110_v4_registry_privacy_monitoring.sql`.
 
-**Not yet operational:** no scheduler or command-line entry point runs the monitoring job. It is a tested library
-function (`monitor_window`) that an operator or a future scheduled job must call. See "Remaining work".
+**Not yet scheduled:** the job runs from the command line
+(`python -m sews_services.jobs monitor --model-registry-id <uuid>`, docs/architecture/deployment.md), but no
+scheduler calls it yet. See "Remaining work".
 
 ## What is monitored
 
@@ -66,6 +67,7 @@ A constant reference feature is compared as "equal to the reference value" vs "d
 
 ## Remaining work
 
-- A scheduled runner (for example a nightly job per active production model with a 7-day window and the previous
-  7-day window as reference). Where it runs is an owner decision (it needs the service-role database connection).
+- A schedule for the command-line runner (its defaults: a 7-day window ending yesterday in the institution's time
+  zone, with the previous 7 days as reference). Where it runs is an owner decision (it needs the service-role
+  database connection).
 - Subgroup (fairness) monitoring on live data needs audit attributes that the institutional schema does not hold yet.

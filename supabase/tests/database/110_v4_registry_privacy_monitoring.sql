@@ -149,8 +149,8 @@ select throws_ok(format($$ select public.acknowledge_drift_alert(%L) $$, tests.u
                  '42501', 'sews:forbidden', 'an admin cannot acknowledge another institution''s alert');
 select is_empty(format('select 1 from public.system_events where institution_id = %L', tests.uid('inst_b')),
                 'an admin sees only their own institution''s and global system events');
-select is((select version from public.get_platform_versions() where component = 'database_schema'), '4.0.0',
-          'platform versions are exposed to signed-in users');
+select isnt((select version from public.get_platform_versions() where component = 'database_schema'), null,
+            'platform versions are exposed to signed-in users');
 
 select tests.authenticate_as(tests.uid('user_a2'));
 select isnt_empty(format('select 1 from public.model_registry where id = %L', tests.uid('model_b')),

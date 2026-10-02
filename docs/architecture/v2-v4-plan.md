@@ -58,7 +58,7 @@ Started 2026-09-24. This file is the working plan; items are ticked only after v
 
 ## Checklist
 
-Database verified 2026-09-25: 13 pgTAP files, 377 assertions; mutation check on gating and check-ins passed.
+Database verified 2026-10-02: 14 pgTAP files, 390 assertions (mutation check on gating and check-ins: 2026-09-25).
 Note: migrations are idempotent but do not repair manual drift (a hand-dropped inline constraint is not recreated).
 ### Database
 - [x] V2 migration: terms, LMS integrations, canonical engagement events, prediction trajectory, intervention workflow, notifications delivery + types, realtime publication
@@ -85,13 +85,18 @@ Note: migrations are idempotent but do not repair manual drift (a hand-dropped i
 - [x] Admin: model/monitoring view; role routing; minimum-version gate (app 2.0.0)
 - Mobile 2026-09-25: flutter analyze clean; 102 tests pass (incl. 9 V2 widget tests); debug APK built
 ### Docs & verification
-- [ ] Federated-learning design (no prototype unless justified), backups, environments, versioning, security review
+- [x] 2026-10-02: federated-learning design (docs/architecture/federated-learning.md; no prototype — not justified),
+      backups (docs/architecture/backups.md), deployment (docs/architecture/deployment.md), ML results
+      (docs/ml/results-v2.md), fairness notes (docs/ml/fairness.md); environments and versioning updated
 - [x] Docs referenced by code written 2026-09-25: docs/ml/risk-trajectory.md, docs/ml/monitoring.md,
       docs/ml/intervention-outcomes.md, docs/architecture/versioning.md, docs/architecture/environments.md (owner chose
       this path; config.py reference corrected). Mobile dev example config now points at the local stack.
-- [ ] Rules version not stored with interventions (docs/architecture/versioning.md "Known gap") — needs a migration
-- [ ] No scheduler / CLI runs the jobs (scoring, recommend, outcomes, monitoring, delivery) — owner decides where
+- [x] Rules version stored with interventions: migration `20261002001200_rules_version.sql` (schema 4.1.0), job writes
+      `rule_version`, pgTAP `120_rules_version.sql`; seed suggestions aligned with `rules-1.0.0` (hosted push: owner)
+- [x] CLI for the jobs: `python -m sews_services.jobs` (`services/sews_services/jobs/cli.py`, 13 tests)
+- [ ] Scheduler for the jobs — owner decides where (docs/architecture/deployment.md)
 - [x] Security checks 2026-09-25: pip-audit (services + ml locks) no known vulns; OSV (106 hosted pub packages) no known
       vulns, checker positive-controlled; 27/27 public tables have RLS; 0 client grants on private schema; 0 anon EXECUTE on
       public functions; all SECURITY DEFINER functions pin search_path; no string-built SQL in services/ml
-- [ ] All test suites + builds; production-readiness report
+- [x] 2026-10-02 all suites + builds: database 14 files / 390 assertions; ML 139; services 115; mobile 109; debug and
+      release APKs; dependency audits clean; production-readiness report: docs/production-readiness.md

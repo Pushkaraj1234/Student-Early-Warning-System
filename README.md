@@ -30,7 +30,10 @@ ML inference interface (ml/inference) ◄── model registry (ml/artifacts) �
 Details: [system-architecture.md](docs/architecture/system-architecture.md) ·
 [technology-decisions.md](docs/architecture/technology-decisions.md) ·
 [database-design.md](docs/database/database-design.md) ·
-[data-contract.md](docs/ml/data-contract.md) · [baseline-results-v1.md](docs/ml/baseline-results-v1.md)
+[data-contract.md](docs/ml/data-contract.md) · [baseline-results-v1.md](docs/ml/baseline-results-v1.md) ·
+[results-v2.md](docs/ml/results-v2.md) · [fairness.md](docs/ml/fairness.md) ·
+[deployment.md](docs/architecture/deployment.md) · [backups.md](docs/architecture/backups.md) ·
+[production-readiness.md](docs/production-readiness.md)
 
 ## Repository structure
 
@@ -41,7 +44,7 @@ ml/                     Python ML pipeline: data/ features/ training/ evaluation
   configs/oulad_v1.json     training configuration (dataset path is configurable)
   data/raw/ (git-ignored)   downloaded datasets        artifacts/ (git-ignored)  trained models
   reports/                  evaluation reports (aggregate metrics only)
-supabase/               config.toml, migrations/ (8), tests/database/ (pgTAP), seed.sql (synthetic), types/schema_contract.json
+supabase/               config.toml, migrations/ (12), tests/database/ (pgTAP), seed.sql (synthetic), types/schema_contract.json
 scripts/db/             local database test harness (no Docker needed) and schema-contract export
 docs/                   research, architecture, database, ML and security documentation
 ```
@@ -86,12 +89,12 @@ The local test cluster used here listens on port 54330 (`initdb` + `pg_ctl`, see
 
 ## Testing
 
-| Layer | Command | Result (2026-09-25) |
+| Layer | Command | Result (2026-10-02) |
 |---|---|---|
-| Database | `bash scripts/db/test-local.sh` | 13 files, 377 assertions passed |
-| ML | `ml/.venv/Scripts/python -m pytest -c ml/pyproject.toml ml/tests` · `ruff check` · `mypy --strict` | 133 passed · clean · clean |
-| Services | `services/.venv/Scripts/python -m pytest -c services/pyproject.toml services/tests` · `ruff` · `mypy --strict` | 102 passed (39 against a rebuilt local DB) · clean · clean |
-| Mobile | `flutter analyze` · `flutter test` · `flutter build apk --debug` | no issues · 103 passed · built (2026-09-25) |
+| Database | `bash scripts/db/test-local.sh` | 12 migrations applied twice; 14 files, 390 assertions passed |
+| ML | `ml/.venv/Scripts/python -m pytest -c ml/pyproject.toml ml/tests` · `ruff check --config ml/pyproject.toml ml` · `mypy --config-file ml/pyproject.toml ml` | 139 passed · clean · clean |
+| Services | `services/.venv/Scripts/python -m pytest -c services/pyproject.toml services/tests` · `ruff check --config services/pyproject.toml services` · `mypy --config-file services/pyproject.toml services/sews_services services/tests` | 115 passed (incl. tests against a rebuilt local DB) · clean · clean |
+| Mobile | `flutter analyze` · `flutter test` · `flutter build apk --debug` / `--release` | no issues · 109 passed · both built; the release APK launches on the emulator (signed with the debug key until the owner adds one) |
 | Dependencies | `pip-audit -r services/requirements.lock` / `ml/requirements.lock` · `python scripts/security/osv_check_pub.py apps/mobile/pubspec.lock` | no known vulnerabilities (106 Dart packages) |
 
 ## Verification status
@@ -101,8 +104,11 @@ logout, session restoration, email-confirmation handling (against a fake Supabas
 network-failure, invalid-data and prediction-unavailable states (widget tests); leakage-safe features and
 inference validation (Python tests).
 
-**Not yet verified:** migrations and pgTAP tests on real Supabase (needs `supabase link` or Docker);
-end-to-end sign-up with real email delivery; the app on a device/emulator against the hosted project.
+Verified against the hosted **testing** project (2026-09-26, synthetic data): migrations applied; `anon` refused
+everywhere; the student and mentor flows on the Android emulator, from offer to completion.
+
+**Not yet verified:** pgTAP on hosted Supabase (`supabase test db` needs Docker); sign-up with real email
+delivery (needs custom SMTP); the admin screens live; iOS. Full status: [production-readiness.md](docs/production-readiness.md).
 
 ## Deployment overview
 
@@ -110,6 +116,8 @@ end-to-end sign-up with real email delivery; the app on a device/emulator agains
   run pgTAP against the linked DB. Configure Auth in the dashboard (email confirmation, password policy,
   redirect URL `io.sews.app://login-callback`). Never load `seed.sql` into a project with real data.
 - **Mobile:** Android release builds; iOS needs a macOS build host.
+- **Batch jobs:** `python -m sews_services.jobs score|recommend|outcomes|monitor|deliver` (one job per process,
+  for any scheduler); where they run is an owner decision. See [deployment.md](docs/architecture/deployment.md).
 - **ML:** benchmark-trained models are **not** approved for real students. Deployments scoring real
   students must construct `InferenceService(..., allowed_provenance={"institutional"})`.
 

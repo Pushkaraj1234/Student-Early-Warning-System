@@ -86,6 +86,8 @@ synthetic seed with `npx supabase@2.117.0 db push --linked --include-seed` after
 role (`42501`). It holds **synthetic data only**; real student data needs a separate production project.
 The mobile app targets it with `config/testing.local.json` (git-ignored). The pgTAP suite has not been run
 against it (`supabase test db` needs Docker).
+Migration `20261002001200_rules_version.sql` (schema 4.1.0, 2026-10-02) is **not yet applied** there; the owner
+pushes it (docs/architecture/deployment.md).
 
 ## Promotion path
 
@@ -95,4 +97,5 @@ against it (`supabase test db` needs Docker).
 3. Production: apply the same, already-tested migrations; register and approve models through the registry
    lifecycle; never load seed data.
 
-Backups and recovery for the hosted projects are not yet documented (remaining work).
+Backups and recovery: docs/architecture/backups.md. Running the batch jobs and other owner steps:
+docs/architecture/deployment.md.

@@ -24,6 +24,7 @@ from sews_services.jobs.notifications import (
 from sews_services.jobs.outcomes import compute_outcomes
 from sews_services.jobs.recommend import recommend_for_institution
 from sews_services.jobs.scoring import ScoringRefusedError, score_institution
+from sews_services.recommendations.engine import RULES_VERSION
 
 from ml.inference.schemas import API_VERSION
 from ml.models.artifact import ModelArtifact
@@ -249,13 +250,14 @@ def test_recommendation_job_stores_reviewable_rule_output_idempotently(conn: Con
     assert stats.students == 3 and stats.recommendations >= 1
     rows = conn.execute(
         """select student_id::text as student_id, intervention_type, status, source, created_by, rule_id, reason,
-                  priority
+                  priority, rule_version
            from public.interventions where source = 'model_rule' and rule_id is not null
              and created_at >= now() - interval '1 minute'"""
     ).fetchall()
     assert rows
     for r in rows:
         assert r["status"] == "recommended" and r["created_by"] is None
+        assert r["rule_version"] == RULES_VERSION
         assert r["intervention_type"] not in {"wellbeing_referral", "academic_counselling"}
         assert 3 <= len(r["reason"]) <= 500 and r["priority"] in {"low", "medium", "high"}
     beta_types = {r["intervention_type"] for r in rows if r["student_id"] == BETA}

@@ -647,6 +647,11 @@
                 "name": "decline_reason",
                 "type": "text",
                 "nullable": true
+            },
+            {
+                "name": "rule_version",
+                "type": "text",
+                "nullable": true
             }
         ],
         "notifications": [

@@ -233,16 +233,21 @@ on conflict do nothing;
 
 -- ----------------------------------------------------------- interventions
 -- Unreviewed rule-engine recommendations (status 'recommended'): students see them only after
--- a mentor approves them.
-insert into public.interventions (id, student_id, prediction_id, intervention_type, status, source, due_on, reason, priority, rule_id)
+-- a mentor approves them. Rule ids, reasons and priorities are what rules-1.0.0
+-- (services/sews_services/recommendations/engine.py) produces for Beta's seeded data: 14-day
+-- attendance 52% (< 60%: high) and a high academic estimate. Only the risk rule links a prediction.
+insert into public.interventions (id, student_id, prediction_id, intervention_type, status, source, due_on, reason,
+                                  priority, rule_id, rule_version)
 select md5('seed-iv-' || v.student_id || v.intervention_type)::uuid, v.student_id::uuid,
-       md5('seed-rp-' || v.student_id || 0)::uuid, v.intervention_type, 'recommended', 'model_rule',
-       current_date + v.due_in_days, v.reason, v.priority, v.rule_id
+       case when v.links_prediction then md5('seed-rp-' || v.student_id || 0)::uuid end,
+       v.intervention_type, 'recommended', 'model_rule', current_date + v.due_in_days, v.reason, v.priority,
+       v.rule_id, 'rules-1.0.0'
 from (values
-  ('a0000000-0000-4000-8000-000000000042', 'attendance_follow_up', 7, 'Attendance in the last 14 days fell below the previous 14 days (synthetic demo).', 'high', 'attendance_deterioration'),
-  ('a0000000-0000-4000-8000-000000000042', 'study_planning', 10, 'Submissions missed or late in recent assignments (synthetic demo).', 'medium', 'assignment_deterioration'),
-  ('a0000000-0000-4000-8000-000000000043', 'mentor_meeting', 14, 'Signal on watch for several updates (synthetic demo).', 'low', 'persistent_watch')
-) as v (student_id, intervention_type, due_in_days, reason, priority, rule_id)
+  ('a0000000-0000-4000-8000-000000000042', 'attendance_follow_up', 7,
+   'Attendance in the last 14 days was 52%, below the 75% requirement.', 'high', 'attendance.below_requirement', false),
+  ('a0000000-0000-4000-8000-000000000042', 'mentor_meeting', 10,
+   'The academic early-warning estimate is high.', 'high', 'risk.high_or_rising', true)
+) as v (student_id, intervention_type, due_in_days, reason, priority, rule_id, links_prediction)
 on conflict do nothing;
 
 -- Academic terms (odd/even semesters) and a synthetic LMS integration.

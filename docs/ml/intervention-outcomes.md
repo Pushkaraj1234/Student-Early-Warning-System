@@ -14,7 +14,7 @@ The status workflow is enforced by the database; timestamps are set by the trigg
 
 | Event | Status | Recorded as |
 |---|---|---|
-| Rule engine suggests | `recommended` (hidden from the student) | `created_at`, `source = model_rule`, `rule_id`, `reason`, `priority` |
+| Rule engine suggests | `recommended` (hidden from the student) | `created_at`, `source = model_rule`, `rule_id`, `rule_version` (schema 4.1.0+), `reason`, `priority` |
 | Staff create or approve (offer) | `pending` | `offered_at`, `reviewed_by`/`reviewed_at` for approvals |
 | Assigned to a staff member | (any open status) | `assigned_to`, `assigned_at` |
 | Student accepts | `accepted` | `responded_at` |
