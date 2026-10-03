@@ -3,6 +3,7 @@
 One process runs one job and exits, so any scheduler (cron, a CI schedule, a cloud scheduler) can call it.
 Where and how often it runs is an owner decision (docs/architecture/deployment.md); the order for a
 nightly run is: score -> recommend -> outcomes -> deliver, and monitor per active production model.
+``train`` runs on demand, e.g. after a semester's results are published (docs/ml/institutional-training.md).
 
 Settings come from environment variables (sews_services.config) and are checked before any connection is
 opened: a development process can only reach a loopback database, production only institutional models.
@@ -13,15 +14,18 @@ without data values), 2 invalid configuration or arguments, 3 the job refused to
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import logging
 import sys
 import uuid
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
 from typing import Any, get_args
 
 import psycopg
+from pydantic import ValidationError
 
 from ml.models.registry import ModelRegistry
 from ml.training.config import Target
@@ -33,6 +37,8 @@ from sews_services.jobs.notifications import NoPushProvider, deliver_pending
 from sews_services.jobs.outcomes import compute_outcomes
 from sews_services.jobs.recommend import recommend_for_institution
 from sews_services.jobs.scoring import ScoringRefusedError, score_institution
+from sews_services.training.config import DEFAULT_CONFIG, load_training_config
+from sews_services.training.train import TrainingRefusedError, render_markdown, train_institution
 
 EXIT_OK = 0
 EXIT_ERROR = 1
@@ -98,6 +104,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     deliver = commands.add_parser("deliver", help="deliver pending push notifications")
     deliver.add_argument("--batch-size", type=_bounded(1, MAX_DELIVERY_BATCH), default=DEFAULT_DELIVERY_BATCH)
+
+    train = commands.add_parser("train", help="train and register models from one institution's past terms")
+    train.add_argument("--institution", type=_uuid, required=True)
+    train.add_argument("--data-provenance", choices=("institutional", "synthetic"), required=True)
+    train.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    train.add_argument("--report-dir", type=Path, help="also write metrics.json and report.md for the run here")
     return parser
 
 
@@ -117,6 +129,24 @@ def _run(args: argparse.Namespace, conn: Connection, settings: Settings, now: da
         return recommend_for_institution(conn, institution_id=args.institution, now=now).as_dict()
     if args.command == "outcomes":
         return compute_outcomes(conn, now=now).as_dict()
+    if args.command == "train":
+        # The shared training core prints per-model progress; it goes to stderr so stdout stays one JSON line.
+        with contextlib.redirect_stdout(sys.stderr):
+            run_summary = train_institution(
+                conn,
+                settings,
+                args.training_config,
+                institution_id=args.institution,
+                data_provenance=args.data_provenance,
+                now=now,
+                repo_root=Path.cwd(),
+            )
+        if args.report_dir is not None:
+            directory = args.report_dir / run_summary["run_id"]
+            directory.mkdir(parents=True, exist_ok=False)
+            (directory / "metrics.json").write_text(json.dumps(run_summary, indent=2, default=str), encoding="utf-8")
+            (directory / "report.md").write_text(render_markdown(run_summary), encoding="utf-8")
+        return {k: v for k, v in run_summary.items() if k != "cutoffs"}
     if args.command == "monitor":
         window, reference = monitor_windows(now, args.window_days)
         result = monitor_window(
@@ -139,13 +169,16 @@ def main(
     args = build_parser().parse_args(argv)
     try:
         settings = load_settings(env, require_api_auth=False)
-    except ConfigError as exc:
-        print(f"configuration error: {exc}", file=sys.stderr)  # ConfigError messages never contain secrets
+        if args.command == "train":
+            args.training_config = load_training_config(args.config)
+    except (ConfigError, ValidationError, OSError) as exc:
+        # ConfigError and pydantic messages name settings or fields, never secret values.
+        print(f"configuration error: {exc}", file=sys.stderr)
         return EXIT_CONFIG
     try:
         with connect(settings.database_url) as conn:
             result = _run(args, conn, settings, now())
-    except (ScoringRefusedError, TemporalLeakageError) as exc:
+    except (ScoringRefusedError, TemporalLeakageError, TrainingRefusedError) as exc:
         print(f"refused: {exc}", file=sys.stderr)
         return EXIT_REFUSED
     except LookupError:

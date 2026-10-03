@@ -32,8 +32,10 @@ Details: [system-architecture.md](docs/architecture/system-architecture.md) ·
 [database-design.md](docs/database/database-design.md) ·
 [data-contract.md](docs/ml/data-contract.md) · [baseline-results-v1.md](docs/ml/baseline-results-v1.md) ·
 [results-v2.md](docs/ml/results-v2.md) · [fairness.md](docs/ml/fairness.md) ·
+[institutional-training.md](docs/ml/institutional-training.md) ·
 [deployment.md](docs/architecture/deployment.md) · [backups.md](docs/architecture/backups.md) ·
-[production-readiness.md](docs/production-readiness.md)
+[production-readiness.md](docs/production-readiness.md) ·
+Course (research methodology, 10 weeks): [course-alignment.md](docs/research/course-alignment.md)
 
 ## Repository structure
 
@@ -93,7 +95,7 @@ The local test cluster used here listens on port 54330 (`initdb` + `pg_ctl`, see
 |---|---|---|
 | Database | `bash scripts/db/test-local.sh` | 12 migrations applied twice; 14 files, 390 assertions passed |
 | ML | `ml/.venv/Scripts/python -m pytest -c ml/pyproject.toml ml/tests` · `ruff check --config ml/pyproject.toml ml` · `mypy --config-file ml/pyproject.toml ml` | 139 passed · clean · clean |
-| Services | `services/.venv/Scripts/python -m pytest -c services/pyproject.toml services/tests` · `ruff check --config services/pyproject.toml services` · `mypy --config-file services/pyproject.toml services/sews_services services/tests` | 115 passed (incl. tests against a rebuilt local DB) · clean · clean |
+| Services | `services/.venv/Scripts/python -m pytest -c services/pyproject.toml services/tests` · `ruff check --config services/pyproject.toml services` · `mypy --config-file services/pyproject.toml services/sews_services services/tests` | 130 passed (incl. tests against a rebuilt local DB) · clean · clean |
 | Mobile | `flutter analyze` · `flutter test` · `flutter build apk --debug` / `--release` | no issues · 109 passed · both built; the release APK launches on the emulator (signed with the debug key until the owner adds one) |
 | Dependencies | `pip-audit -r services/requirements.lock` / `ml/requirements.lock` · `python scripts/security/osv_check_pub.py apps/mobile/pubspec.lock` | no known vulnerabilities (106 Dart packages) |
 
@@ -116,8 +118,9 @@ delivery (needs custom SMTP); the admin screens live; iOS. Full status: [product
   run pgTAP against the linked DB. Configure Auth in the dashboard (email confirmation, password policy,
   redirect URL `io.sews.app://login-callback`). Never load `seed.sql` into a project with real data.
 - **Mobile:** Android release builds; iOS needs a macOS build host.
-- **Batch jobs:** `python -m sews_services.jobs score|recommend|outcomes|monitor|deliver` (one job per process,
-  for any scheduler); where they run is an owner decision. See [deployment.md](docs/architecture/deployment.md).
+- **Batch jobs:** `python -m sews_services.jobs score|recommend|outcomes|monitor|deliver|train` (one job per
+  process, for any scheduler); where they run is an owner decision. `train` builds models from the institution's
+  own past terms ([institutional-training.md](docs/ml/institutional-training.md)). See [deployment.md](docs/architecture/deployment.md).
 - **ML:** benchmark-trained models are **not** approved for real students. Deployments scoring real
   students must construct `InferenceService(..., allowed_provenance={"institutional"})`.
 

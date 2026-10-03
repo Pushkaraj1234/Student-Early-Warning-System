@@ -95,6 +95,9 @@ Note: migrations are idempotent but do not repair manual drift (a hand-dropped i
       `rule_version`, pgTAP `120_rules_version.sql`; seed suggestions aligned with `rules-1.0.0` (hosted push: owner)
 - [x] CLI for the jobs: `python -m sews_services.jobs` (`services/sews_services/jobs/cli.py`, 13 tests)
 - [ ] Scheduler for the jobs — owner decides where (docs/architecture/deployment.md)
+- [x] 2026-10-03 institutional training from the database (`python -m sews_services.jobs train`): shared ML core
+      (`train_feature_table`), event-time history, shared labels, registry as `development`; proven on synthetic
+      history (docs/ml/institutional-training.md); 15 tests. Real training waits for institutional records
 - [x] Security checks 2026-09-25: pip-audit (services + ml locks) no known vulns; OSV (106 hosted pub packages) no known
       vulns, checker positive-controlled; 27/27 public tables have RLS; 0 client grants on private schema; 0 anon EXECUTE on
       public functions; all SECURITY DEFINER functions pin search_path; no string-built SQL in services/ml

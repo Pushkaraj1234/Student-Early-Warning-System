@@ -1,0 +1,15 @@
+{
+  "run_name": "inst-v1",
+  "cutoff_days": [30, 60, 90],
+  "min_label_coverage": 0.8,
+  "min_class_count_per_split": 20,
+  "models": ["logistic_regression", "random_forest", "xgboost"],
+  "imbalance_strategies": ["none", "balanced"],
+  "calibration_method": "sigmoid",
+  "risk_level_quantiles": {"watch": 0.5, "elevated": 0.75, "high": 0.9},
+  "top_fractions": [0.1, 0.2, 0.3],
+  "selection_tolerance_pr_auc": 0.01,
+  "stability_seeds": [0, 1, 2],
+  "bootstrap_iterations": 300,
+  "random_seed": 20261003
+}

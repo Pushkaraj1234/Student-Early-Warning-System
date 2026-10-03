@@ -20,6 +20,7 @@ import json
 import platform
 import subprocess
 import sys
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -35,7 +36,7 @@ from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_s
 from sklearn.pipeline import Pipeline
 
 from ml.data.contract import AUDIT_PREFIX, TARGET_COLUMN, validate_feature_table
-from ml.data.oulad import DATASET_NAME, OuladTables, dataset_version, load_oulad
+from ml.data.oulad import DATASET_NAME, OuladTables, dataset_version, load_oulad, presentation_sort_key
 from ml.evaluation.metrics import (
     best_f1_threshold,
     bootstrap_ci,
@@ -61,9 +62,9 @@ from ml.monitoring.drift import (
     performance_drop,
     prediction_drift,
 )
-from ml.training.config import TrainingConfig, load_config
+from ml.training.config import ModelSelectionConfig, Provenance, TrainingConfig, load_config
 from ml.training.selection import Candidate, StrategyResult, choose_imbalance_strategy, select_model
-from ml.training.splits import split_frame
+from ml.training.splits import SortKey, TemporalSplit, split_frame
 
 MODEL_ABBREVIATIONS: dict[ModelName, str] = {
     "logistic_regression": "lr",
@@ -72,6 +73,26 @@ MODEL_ABBREVIATIONS: dict[ModelName, str] = {
 }
 TARGET_ABBREVIATIONS = {"academic": "acad", "dropout": "drop", "course_failure": "fail", "engagement": "eng"}
 EXPLAIN_SAMPLE = 400
+
+
+@dataclass(frozen=True)
+class FeatureTableSpec:
+    """What the source-independent training core needs to know about one feature table (one target and
+    decision point). Benchmark training builds it from a TrainingConfig; institutional training builds it
+    from the database's academic terms (services/sews_services/training)."""
+
+    feature_names: tuple[str, ...]
+    feature_version: str
+    target: str
+    target_definition: str
+    target_horizon: str
+    cutoff_day: int
+    split: TemporalSplit
+    calibration_check: TemporalSplit | None
+    sort_key: SortKey
+    dataset_name: str
+    dataset_version: str
+    data_provenance: Provenance
 
 
 def _git_commit(repo_root: Path) -> str | None:
@@ -153,7 +174,7 @@ def _stability(
     }
 
 
-def _risk_thresholds(p_val: np.ndarray, config: TrainingConfig) -> RiskThresholds:
+def _risk_thresholds(p_val: np.ndarray, config: ModelSelectionConfig) -> RiskThresholds:
     q = config.risk_level_quantiles
     values = np.quantile(p_val, [q.watch, q.elevated, q.high])
     return RiskThresholds(watch=float(values[0]), elevated=float(values[1]), high=float(values[2]))
@@ -177,13 +198,14 @@ def _level_table(y: np.ndarray, p: np.ndarray, thresholds: RiskThresholds) -> li
 
 
 def _calibration_decision(
-    config: TrainingConfig, name: ModelName, strategy: Any, df: pd.DataFrame, names: tuple[str, ...]
+    config: ModelSelectionConfig, spec: FeatureTableSpec, name: ModelName, strategy: Any, df: pd.DataFrame
 ) -> dict[str, Any]:
     """Apply calibration only if an out-of-time check shows it improves BOTH Brier and ECE."""
-    check = config.calibration_check
+    check = spec.calibration_check
     if check is None:
         return {"apply": False, "reason": "no calibration check configured; calibration not applied"}
-    frames = split_frame(df, check.to_split())
+    names = spec.feature_names
+    frames = split_frame(df, check, sort_key=spec.sort_key)
     X_a, y_a = _xy(frames.train, names)
     X_b, y_b = _xy(frames.validation, names)
     X_c, y_c = _xy(frames.test, names)
@@ -200,8 +222,8 @@ def _calibration_decision(
     return {
         "check_split": {
             "train": list(check.train),
-            "calibrate": list(check.calibrate),
-            "evaluate": list(check.evaluate),
+            "calibrate": list(check.validation),
+            "evaluate": list(check.test),
         },
         "method": config.calibration_method,
         "brier_raw": brier_raw,
@@ -238,8 +260,48 @@ def train_target_cutoff(
         target=target,
         feature_version=config.feature_version,
     )
+    spec = FeatureTableSpec(
+        feature_names=names,
+        feature_version=config.feature_version,
+        target=target,
+        target_definition=TARGETS[target].definition,
+        target_horizon=TARGETS[target].horizon,
+        cutoff_day=cutoff,
+        split=config.split.to_split(),
+        calibration_check=config.calibration_check.to_split() if config.calibration_check else None,
+        sort_key=presentation_sort_key,
+        dataset_name=DATASET_NAME,
+        dataset_version=ds_version,
+        data_provenance=config.dataset.provenance,
+    )
+    return train_feature_table(
+        config,
+        df,
+        spec,
+        run_id=run_id,
+        registry_root=registry_root,
+        repo_root=repo_root,
+        timestamp=timestamp,
+        leakage_check=leakage_check,
+    )
+
+
+def train_feature_table(
+    config: ModelSelectionConfig,
+    df: pd.DataFrame,
+    spec: FeatureTableSpec,
+    *,
+    run_id: str,
+    registry_root: Path,
+    repo_root: Path,
+    timestamp: datetime,
+    leakage_check: dict[str, Any],
+) -> dict[str, Any]:
+    """Train every configured model on one validated feature table, evaluate it out of time and save a
+    versioned artifact per model; returns the per-model metrics and the selected model."""
+    names, target, cutoff = spec.feature_names, spec.target, spec.cutoff_day
     validate_feature_table(df, names)
-    frames = split_frame(df, config.split.to_split())
+    frames = split_frame(df, spec.split, sort_key=spec.sort_key)
     X_tr, y_tr = _xy(frames.train, names)
     X_val, y_val = _xy(frames.validation, names)
     X_te, y_te = _xy(frames.test, names)
@@ -255,8 +317,8 @@ def train_target_cutoff(
     }
     header = {
         "target": target,
-        "target_definition": TARGETS[target].definition,
-        "target_horizon": TARGETS[target].horizon,
+        "target_definition": spec.target_definition,
+        "target_horizon": spec.target_horizon,
         "cutoff_day": cutoff,
         "rows": len(df),
         "unassigned_rows": frames.unassigned_rows,
@@ -295,7 +357,7 @@ def train_target_cutoff(
         pipe = fitted[strategy]
         stability = _stability(name, strategy, names, X_tr, y_tr, X_val, y_val, config.stability_seeds)
 
-        decision = _calibration_decision(config, name, strategy, df, names)
+        decision = _calibration_decision(config, spec, name, strategy, df)
         fitted_calibrator = CalibratedClassifierCV(
             FrozenEstimator(pipe), method=config.calibration_method, ensemble=False
         ).fit(X_val, y_val)
@@ -385,19 +447,19 @@ def train_target_cutoff(
         metadata = ModelMetadata(
             model_version=model_version,
             model_name=name,
-            feature_version=config.feature_version,
+            feature_version=spec.feature_version,
             feature_names=names,
-            dataset_name=DATASET_NAME,
-            dataset_version=ds_version,
-            data_provenance=config.dataset.provenance,
+            dataset_name=spec.dataset_name,
+            dataset_version=spec.dataset_version,
+            data_provenance=spec.data_provenance,
             cutoff_day=cutoff,
             target=target,
-            target_definition=f"{TARGETS[target].definition}; horizon: {TARGETS[target].horizon}",
+            target_definition=f"{spec.target_definition}; horizon: {spec.target_horizon}",
             training_timestamp=timestamp,
             split={
-                "train": list(config.split.train),
-                "validation": list(config.split.validation),
-                "test": list(config.split.test),
+                "train": list(spec.split.train),
+                "validation": list(spec.split.validation),
+                "test": list(spec.split.test),
             },
             imbalance_strategy=strategy,
             hyperparameters=model_hyperparameters(pipe),

@@ -27,11 +27,14 @@ PYTHONPATH="services:." services/.venv/bin/python -m sews_services.jobs --help  
 | `outcomes` | all institutions | descriptive outcome measures for finished interventions |
 | `monitor --model-registry-id <uuid> [--window-days 7] [--no-reference]` | one registered model | monitoring snapshot and drift alerts (window = the last complete local days, reference = the days before) |
 | `deliver [--batch-size 100]` | all | processes pending notifications; with no push provider configured they are marked `skipped` |
+| `train --institution <uuid> --data-provenance institutional\|synthetic [--config F] [--report-dir D]` | one institution | trains on its completed terms and registers the selected models as `development` (docs/ml/institutional-training.md) |
 
 Nightly order per institution: `score` → `recommend` → `outcomes` → `deliver`; then `monitor` for each
-production model. Output is one JSON line of counts (no identifiers). Exit codes: `0` done, `1` database error
+production model. `train` runs on demand, typically after a semester's results are published; approving a
+trained model is a separate, human step (docs/ml/institutional-training.md). Output is one JSON line of counts (no identifiers). Exit codes: `0` done, `1` database error
 (logged as class and SQLSTATE only), `2` invalid configuration or arguments, `3` refused (e.g. no production
-model, artifact hash mismatch, model trained on a disallowed data provenance, temporal leakage).
+model, artifact hash mismatch, model trained on a disallowed data provenance, temporal leakage, too few terms
+with published results).
 
 Required environment (secrets from the scheduler's secret store, never a file in Git):
 `SEWS_ENV`, `SEWS_DATABASE_URL` (**secret**: the service-role/`postgres` connection string),

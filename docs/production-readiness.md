@@ -12,7 +12,8 @@ account or data that only the owner can provide.
 | Database | 12 migrations apply twice (idempotent); 14 pgTAP files, 390 assertions pass | `bash scripts/db/test-local.sh` (local PostgreSQL 18) |
 | Row-level security | 27/27 public tables have RLS; 0 anonymous EXECUTE on public functions; 0 client grants on `private`; every SECURITY DEFINER function pins `search_path` | catalogue queries on the rebuilt test database; per-role pgTAP tests (anon, student, mentor, faculty, admin) |
 | Hosted testing project | 11 migrations applied by the owner; `anon` refused everywhere (`42501`) | read-only checks with the anon key (2026-09-26) |
-| Services | 115 tests (incl. the batch-job CLI and the recommendation job against a rebuilt local DB); ruff, format, mypy --strict clean | `services/.venv` |
+| Services | 130 tests (incl. the batch-job CLI, the recommendation job and institutional training against a rebuilt local DB); ruff, format, mypy --strict clean | `services/.venv` |
+| Institutional training | trains, evaluates (out of time, by term) and registers models from the database; proven on a 400-student synthetic history (test PR-AUC 0.705 at day 60, prevalence 0.169); the trained model then scored the current term | docs/ml/institutional-training.md |
 | ML pipeline | 139 tests; ruff, mypy clean; temporal leakage guard passes at days 30/60/90 | `ml/.venv`; docs/ml/results-v2.md |
 | Mobile | analyzer clean; 109 tests; debug and release APKs build; the release APK launches and validates input on the emulator | `flutter analyze`, `flutter test`, `flutter build apk --release` |
 | Live app (hosted testing project, synthetic data) | Student: sign-in, dashboard, explanation, check-in, attendance, assignments, accepting an offer, notifications. Mentor: caseload, student detail, review & offer, completion with outcome | driven on the Android emulator, 2026-09-26 |
@@ -22,7 +23,7 @@ account or data that only the owner can provide.
 
 | # | Blocker | Why it blocks | Reference |
 |---|---|---|---|
-| 1 | **No institutional model.** Only benchmark (UK) models exist; production refuses non-institutional models | Without it there are no real predictions | docs/ml/ml-strategy.md §5, docs/ml/results-v2.md |
+| 1 | **No institutional model.** The in-app training job exists and is proven on synthetic data, but no real records exist to train on (needs at least 3 completed terms with published results); production refuses non-institutional models | Without it there are no real predictions | docs/ml/institutional-training.md, docs/ml/ml-strategy.md §5 |
 | 2 | **Jobs are not scheduled.** The CLI exists; nothing runs it | Predictions, suggestions and outcomes would never update | docs/architecture/deployment.md |
 | 3 | **No production Supabase project** (the hosted one is testing-only, synthetic data) | Real data must not share a project with seed data | docs/architecture/environments.md |
 | 4 | **No custom SMTP** | Real students cannot confirm their email addresses | docs/architecture/deployment.md |
@@ -39,6 +40,8 @@ account or data that only the owner can provide.
 - No push notifications (in-app only); the delivery job marks notifications `skipped`.
 - iOS has not been built or tested.
 - The inference API is tested locally but not deployed (the batch scoring job does not need it).
+- Approving a trained model is an operator SQL step; the admin screen has no approve button yet.
+- The schema has no withdrawal date, which biases training slightly (docs/ml/institutional-training.md).
 
 ## Suggested order
 

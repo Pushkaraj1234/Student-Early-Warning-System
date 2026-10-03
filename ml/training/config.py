@@ -67,22 +67,16 @@ class RiskLevelQuantiles(BaseModel):
         return self
 
 
-class TrainingConfig(BaseModel):
+class ModelSelectionConfig(BaseModel):
+    """How candidate models are trained, compared, calibrated and selected, independent of the data
+    source. Shared by benchmark training (TrainingConfig) and institutional training
+    (services/sews_services/training)."""
+
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    run_name: str = Field(pattern=r"^[a-z0-9][a-z0-9-]{2,40}$")
-    dataset: DatasetConfig
-    feature_version: str = FEATURE_VERSION
-    targets: tuple[Target, ...] = ("academic",)
-    primary_target: Target = "academic"
-    calibration_check: CalibrationCheckConfig | None = None
     # A (target, cutoff) is trained only if every split has at least this many positives AND negatives;
     # otherwise it is skipped and the reason recorded ("where data suffices").
     min_class_count_per_split: int = Field(default=20, ge=5)
-    cutoff_days: tuple[int, ...] = Field(min_length=1)
-    primary_cutoff_day: int
-    score_release_lag_days: int = Field(ge=0, le=90)
-    split: SplitConfig
     models: tuple[ModelName, ...] = Field(min_length=1)
     imbalance_strategies: tuple[ImbalanceStrategy, ...] = Field(min_length=1)
     calibration_method: Literal["sigmoid", "isotonic"]
@@ -92,6 +86,26 @@ class TrainingConfig(BaseModel):
     stability_seeds: tuple[int, ...] = Field(min_length=2)
     bootstrap_iterations: int = Field(ge=50, le=10000)
     random_seed: int
+
+    @field_validator("top_fractions")
+    @classmethod
+    def _fractions(cls, value: tuple[float, ...]) -> tuple[float, ...]:
+        if any(not 0 < v < 1 for v in value):
+            raise ValueError("top_fractions must be in (0, 1)")
+        return value
+
+
+class TrainingConfig(ModelSelectionConfig):
+    run_name: str = Field(pattern=r"^[a-z0-9][a-z0-9-]{2,40}$")
+    dataset: DatasetConfig
+    feature_version: str = FEATURE_VERSION
+    targets: tuple[Target, ...] = ("academic",)
+    primary_target: Target = "academic"
+    calibration_check: CalibrationCheckConfig | None = None
+    cutoff_days: tuple[int, ...] = Field(min_length=1)
+    primary_cutoff_day: int
+    score_release_lag_days: int = Field(ge=0, le=90)
+    split: SplitConfig
     output_dir: Path
     report_dir: Path
 
@@ -101,13 +115,6 @@ class TrainingConfig(BaseModel):
         if any(v < 1 for v in value) or len(set(value)) != len(value):
             raise ValueError("cutoff_days must be unique positive integers")
         return tuple(sorted(value))
-
-    @field_validator("top_fractions")
-    @classmethod
-    def _fractions(cls, value: tuple[float, ...]) -> tuple[float, ...]:
-        if any(not 0 < v < 1 for v in value):
-            raise ValueError("top_fractions must be in (0, 1)")
-        return value
 
     @model_validator(mode="after")
     def _primary_in_cutoffs(self) -> TrainingConfig:

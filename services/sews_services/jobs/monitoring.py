@@ -34,6 +34,7 @@ from ml.monitoring.drift import (
     prediction_drift,
 )
 from sews_services.db import Connection, record_system_event
+from sews_services.features.labels import academic_labels
 
 MIN_LABELS = 50
 
@@ -45,19 +46,6 @@ left join private.ml_subject_map m on m.student_id = p.student_id
 left join private.feature_snapshots fs
   on fs.ml_subject_id = m.ml_subject_id and fs.as_of = p.scored_at and fs.feature_version = p.feature_version
 where p.model_registry_id = %(model)s and p.prediction_date between %(start)s and %(end)s
-"""
-
-LABEL_SQL = """
-select sc.student_id::text as student_id,
-       bool_or(sc.status = 'withdrawn' or (sc.result_published_at is not null and sc.grade in ('F', 'Ab')))
-         as adverse,
-       bool_and(sc.status = 'withdrawn' or sc.result_published_at is not null) as all_known
-from public.student_courses sc
-join public.academic_terms t
-  on t.institution_id = sc.institution_id and t.academic_year = sc.academic_year
- and t.term in ('odd', 'even') and (sc.semester %% 2 = 1) = (t.term = 'odd')
-where sc.student_id = any(%(students)s::uuid[]) and %(day)s between t.starts_on and t.ends_on
-group by sc.student_id
 """
 
 
@@ -85,8 +73,9 @@ def _labels(conn: Connection, window: pd.DataFrame) -> pd.Series:
     """Label per prediction row (NaN while unknown)."""
     labels = pd.Series(np.nan, index=window.index)
     for day, group in window.groupby("prediction_date"):
-        rows = conn.execute(LABEL_SQL, {"students": group["student_id"].tolist(), "day": day}).fetchall()
-        known = {r["student_id"]: float(r["adverse"]) for r in rows if r["adverse"] or r["all_known"]}
+        if not isinstance(day, date):
+            raise TypeError("prediction_date must be a date")
+        known = academic_labels(conn, group["student_id"].tolist(), day)
         labels.loc[group.index] = group["student_id"].map(known).astype(float)
     return labels
 
