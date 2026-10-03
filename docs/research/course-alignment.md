@@ -11,7 +11,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 | 1 | Problem identification: problem statement, objectives, scope, expected outcomes | **done** (2026-10-03) | [week01-problem-statement.md](week01-problem-statement.md); detail in [problem-definition.md](problem-definition.md), [project-scope.md](project-scope.md) | Optional: Google Trends screenshot for the topic (yours) |
 | 2 | Literature review, literature matrix, research gaps, research questions | **done** (first version) | [week02-literature-review.md](week02-literature-review.md); [research-questions.md](research-questions.md) | Extend the search in IEEE Xplore / Scopus and add ResearchRabbit or Connected Papers maps (yours, the databases need your institution login) |
 | 3 | AI-assisted research, responsible AI, plagiarism, hallucinations, ethics | **done** (first version) | [week03-ai-use-and-ethics.md](week03-ai-use-and-ethics.md); [security-model.md](../security/security-model.md); [fairness.md](../ml/fairness.md) | Turnitin check of the final report (yours) |
-| 4 | Hypotheses, experimental design, sampling, data collection | **partial** | Design: out-of-time split, decision points, three model families ([results-v2.md](../ml/results-v2.md)); data: OULAD (public, CC BY 4.0), NSS 75th round, synthetic history | Formal hypotheses H1–H5 written before testing |
+| 4 | Hypotheses, experimental design, sampling, data collection | **done** (2026-10-03) | [week04-research-design.md](week04-research-design.md): 10 hypotheses with tests and Holm correction fixed before testing, design, sampling, data sources, planned mentor questionnaire | Run the mentor questionnaire after a pilot (needs ethics approval) |
 | 5 | Data cleaning, missing values, outliers, feature engineering, descriptive statistics, visualisation | **partial** | Feature engineering and leakage guard ([data-contract.md](../ml/data-contract.md)); missing values handled in the pipeline | An exploratory-analysis notebook with descriptive statistics and charts |
 | 6 | Correlation, regression, hypothesis testing, performance metrics, validation | **partial** | Metrics, out-of-time validation, bootstrap confidence intervals, calibration, subgroup audit | Significance tests between models (paired bootstrap / DeLong), feature-family ablation (RQ2), correlation analysis |
 | 7 | Prototype / proof of concept, version control, reproducibility, documentation | **done** | Mobile app, database, backend jobs, ML pipeline, in-app training; GitHub repository; 130 + 139 + 109 automated tests; 390 database checks | — |
@@ -21,7 +21,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 
 ## Order of work from here
 
-1. Week 4 — hypotheses (stated before the tests are run, so they cannot be fitted to the results).
+1. ~~Week 4 — hypotheses~~ done 2026-10-03.
 2. Week 5 — exploratory analysis notebook on OULAD (the only real dataset the project may use).
 3. Week 6 — statistical tests and the feature-family ablation (answers RQ2).
 4. Week 9 — prior-art and TRL (independent of the paper).
