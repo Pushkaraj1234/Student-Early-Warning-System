@@ -1,6 +1,9 @@
 # Problem Definition
 
-> Status: **DRAFT v0.1**. The label and horizon choices in §3–§4 are **[OPEN]** and must be confirmed before any model is trained.
+> Status: **v1.0 (2026-10-03).** The open choices in §3 are settled: the label *fail or withdraw in the term* was
+> decided by the project owner (project-scope.md §9); the horizon (end of the term) and the decision points (days 30,
+> 60 and 90) are the ones the implemented pipeline uses (docs/ml/results-v2.md, docs/ml/institutional-training.md).
+> The original candidate table is kept for the record. Course-format summary: [week01-problem-statement.md](week01-problem-statement.md).
 
 ## 1. Problem statement
 
