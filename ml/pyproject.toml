@@ -31,5 +31,5 @@ exclude = ['^ml/\.venv/', '^ml/data/', '^ml/artifacts/']
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["sklearn.*", "xgboost.*", "shap.*", "joblib.*"]
+module = ["sklearn.*", "xgboost.*", "shap.*", "joblib.*", "scipy.*", "imblearn.*"]
 ignore_missing_imports = true

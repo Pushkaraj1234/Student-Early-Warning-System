@@ -115,3 +115,4 @@ aggregate only.
 | Date | Change | Reason |
 |---|---|---|
 | 2026-10-03 | Initial version | — |
+| 2026-10-03 (before any test was run) | **Clarifications, no change of hypothesis:** (1) H1 uses the XGBoost models (the active model family); logistic regression is reported as a robustness check without a test. (2) Where two tests are listed (H1), the **larger** p-value enters the Holm correction. (3) H3's p-value is the PR-AUC bootstrap (the hypothesis is about PR-AUC); DeLong is reported for ROC-AUC only. (4) Bootstrap p-values: one-sided p = (1 + #{Δ* ≤ 0}) / (B + 1); two-sided p = 2 · min(one-sided p in each direction), capped at 1. (5) Saved V2 artifacts are reused where the hypothesis concerns them (H1, H3, H5); calibration is a monotone transform, so PR-AUC and ROC-AUC are unaffected by it. | The week 4 text left these details open; fixing them before the results are seen keeps the tests pre-specified |

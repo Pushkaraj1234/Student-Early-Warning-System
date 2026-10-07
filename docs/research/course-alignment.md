@@ -13,7 +13,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 | 3 | AI-assisted research, responsible AI, plagiarism, hallucinations, ethics | **done** (first version) | [week03-ai-use-and-ethics.md](week03-ai-use-and-ethics.md); [security-model.md](../security/security-model.md); [fairness.md](../ml/fairness.md) | Turnitin check of the final report (yours) |
 | 4 | Hypotheses, experimental design, sampling, data collection | **done** (2026-10-03) | [week04-research-design.md](week04-research-design.md): 10 hypotheses with tests and Holm correction fixed before testing, design, sampling, data sources, planned mentor questionnaire | Run the mentor questionnaire after a pilot (needs ethics approval) |
 | 5 | Data cleaning, missing values, outliers, feature engineering, descriptive statistics, visualisation | **done** (2026-10-03) | [week05-eda.md](week05-eda.md); generated report with 9 tables and 5 charts (`ml/reports/eda-oulad-20261003T093048Z/`), code `ml/analysis/eda.py` | — |
-| 6 | Correlation, regression, hypothesis testing, performance metrics, validation | **partial** | Metrics, out-of-time validation, bootstrap confidence intervals, calibration, subgroup audit | Significance tests between models (paired bootstrap / DeLong), feature-family ablation (RQ2), correlation analysis |
+| 6 | Correlation, regression, hypothesis testing, performance metrics, validation | **done** (2026-10-03) | [week06-statistical-analysis.md](week06-statistical-analysis.md): 10 pre-registered tests, Holm-corrected, all supported; report `ml/reports/hypotheses-20261003T095318Z/`; code `ml/analysis/hypotheses.py` | — |
 | 7 | Prototype / proof of concept, version control, reproducibility, documentation | **done** | Mobile app, database, backend jobs, ML pipeline, in-app training; GitHub repository; 130 + 139 + 109 automated tests; 390 database checks | — |
 | 8 | Technical writing: abstract, introduction, methodology, results, conclusion; IEEE references | **missing** | Technical docs exist, but no paper | IEEE-format paper (Overleaf template) — needs team names, college, guide (yours) |
 | 9 | Patent search, prior-art analysis, technology readiness level, commercialisation | **missing** | — | Prior-art search (Google Patents / WIPO / InPASS), TRL assessment, commercialisation note |
@@ -23,7 +23,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 
 1. ~~Week 4 — hypotheses~~ done 2026-10-03.
 2. ~~Week 5 — exploratory analysis~~ done 2026-10-03.
-3. Week 6 — statistical tests and the feature-family ablation (answers RQ2).
+3. ~~Week 6 — statistical tests~~ done 2026-10-03.
 4. Week 9 — prior-art and TRL (independent of the paper).
 5. Week 8 — the paper, using the results of weeks 4–6.
 6. Week 10 — poster, slides and viva preparation from the paper.
