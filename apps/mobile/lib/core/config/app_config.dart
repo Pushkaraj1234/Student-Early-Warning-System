@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 /// Thrown when build-time configuration is missing or unsafe.
 class ConfigException implements Exception {
   const ConfigException(this.message);
@@ -21,9 +23,18 @@ class AppConfig {
   final String supabaseUrl;
   final String publishableKey;
 
-  /// Deep link used for email confirmation and password recovery. Must be listed in
-  /// the Supabase project's allowed redirect URLs and in the platform manifests.
-  static const String authRedirectUrl = 'io.sews.app://login-callback';
+  /// Deep link the mobile app receives email-confirmation and password-recovery links on.
+  /// Must be listed in the Supabase project's allowed redirect URLs and in the platform manifests.
+  static const String mobileAuthRedirectUrl = 'io.sews.app://login-callback';
+
+  /// Where email-confirmation and password-recovery links return to on this platform.
+  static String get authRedirectUrl => authRedirectUrlFor(isWeb: kIsWeb, page: Uri.base);
+
+  /// On the web: the root of the site the app is served from (the app reads the auth code from
+  /// the address on start-up); that URL must be in the project's allowed redirect URLs, otherwise
+  /// Supabase falls back to its Site URL. Elsewhere: [mobileAuthRedirectUrl].
+  static String authRedirectUrlFor({required bool isWeb, required Uri page}) =>
+      isWeb ? '${page.origin}/' : mobileAuthRedirectUrl;
 
   /// Version of the privacy notice shown during onboarding.
   static const String privacyNoticeVersion = 'v1';

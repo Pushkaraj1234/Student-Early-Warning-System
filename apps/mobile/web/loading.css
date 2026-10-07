@@ -1,0 +1,60 @@
+/* Shown only until the Flutter app has started (see flutter_bootstrap.js). */
+:root {
+  --sews-bg: #f4fbfa;
+  --sews-fg: #161d1d;
+  --sews-accent: #00696b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sews-bg: #0e1515;
+    --sews-fg: #dde4e3;
+    --sews-accent: #80d4d6;
+  }
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--sews-bg);
+  color: var(--sews-fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+#loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid color-mix(in srgb, var(--sews-accent) 25%, transparent);
+  border-top-color: var(--sews-accent);
+  border-radius: 50%;
+  animation: sews-spin 0.9s linear infinite;
+}
+
+@keyframes sews-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+noscript {
+  display: block;
+  padding: 24px;
+  text-align: center;
+}

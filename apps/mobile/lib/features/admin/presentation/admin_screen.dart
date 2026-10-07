@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sews_mobile/core/data_providers.dart';
@@ -154,7 +155,9 @@ class UpdateRequiredScreen extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const EmptyView(
-                  message: 'This version of SEWS is no longer supported. Please install the latest version to continue.',
+                  message: kIsWeb
+                      ? 'This version of SEWS is no longer supported. Reload the page to load the latest version.'
+                      : 'This version of SEWS is no longer supported. Please install the latest version to continue.',
                   icon: Icons.system_update,
                 ),
                 TextButton(

@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:sews_mobile/core/errors/platform_network_error.dart'
+    if (dart.library.io) 'package:sews_mobile/core/errors/platform_network_error_io.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum FailureKind {
@@ -77,10 +78,9 @@ class AppFailure implements Exception {
 
   static AppFailure _map(Object error) {
     if (error is AppFailure) return error;
-    if (error is SocketException ||
+    if (isPlatformNetworkError(error) ||
         error is http.ClientException ||
         error is TimeoutException ||
-        error is HandshakeException ||
         error is AuthRetryableFetchException) {
       return const AppFailure(FailureKind.network);
     }

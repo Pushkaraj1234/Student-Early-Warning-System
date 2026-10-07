@@ -40,8 +40,9 @@ Course (research methodology, 10 weeks): [course-alignment.md](docs/research/cou
 ## Repository structure
 
 ```
-apps/mobile/            Flutter student app (feature-first: data / domain / application / presentation)
+apps/mobile/            Flutter app for Android and the web (feature-first: data / domain / application / presentation)
   config/dev.example.json   build config template (copy to dev.local.json — git-ignored)
+  web/ · vercel.json · tool/   website shell, Vercel config (rewrite + security headers), build and preview scripts
 ml/                     Python ML pipeline: data/ features/ training/ evaluation/ models/ explainability/ inference/ tests/
   configs/oulad_v1.json     training configuration (dataset path is configurable)
   data/raw/ (git-ignored)   downloaded datasets        artifacts/ (git-ignored)  trained models
@@ -75,6 +76,10 @@ ml/.venv/Scripts/python -m ml.training.train --config ml/configs/oulad_v1.json
 # Mobile
 cd apps/mobile && cp config/dev.example.json config/dev.local.json   # then add the publishable key
 flutter run --dart-define-from-file=config/dev.local.json
+
+# Website (same Flutter app, built for the browser; served like Vercel will serve it)
+cd apps/mobile && flutter build web --release --csp --no-web-resources-cdn --dart-define-from-file=config/<file>.json
+python tool/serve_web.py   # http://localhost:8080
 ```
 
 The local test cluster used here listens on port 54330 (`initdb` + `pg_ctl`, see docs/database/database-design.md §8).
@@ -97,6 +102,7 @@ The local test cluster used here listens on port 54330 (`initdb` + `pg_ctl`, see
 | ML | `ml/.venv/Scripts/python -m pytest -c ml/pyproject.toml ml/tests` · `ruff check --config ml/pyproject.toml ml` · `mypy --config-file ml/pyproject.toml ml` | 139 passed · clean · clean |
 | Services | `services/.venv/Scripts/python -m pytest -c services/pyproject.toml services/tests` · `ruff check --config services/pyproject.toml services` · `mypy --config-file services/pyproject.toml services/sews_services services/tests` | 130 passed (incl. tests against a rebuilt local DB) · clean · clean |
 | Mobile | `flutter analyze` · `flutter test` · `flutter build apk --debug` / `--release` | no issues · 109 passed · both built; the release APK launches on the emulator (signed with the debug key until the owner adds one) |
+| Website (2026-10-05) | `flutter analyze` · `flutter test` · `flutter build web --release --csp --no-web-resources-cdn` · `bash tool/vercel_build.sh` | no issues · 115 passed · built; runs in the browser under the production Content-Security-Policy (sign-in screen, clean addresses, deep links redirect to sign-in) |
 | Dependencies | `pip-audit -r services/requirements.lock` / `ml/requirements.lock` · `python scripts/security/osv_check_pub.py apps/mobile/pubspec.lock` | no known vulnerabilities (106 Dart packages) |
 
 ## Verification status
@@ -117,6 +123,9 @@ delivery (needs custom SMTP); the admin screens live; iOS. Full status: [product
 - **Database:** `npx supabase link` → inspect remote schema (`migration list`, `db pull`) → `db push` →
   run pgTAP against the linked DB. Configure Auth in the dashboard (email confirmation, password policy,
   redirect URL `io.sews.app://login-callback`). Never load `seed.sql` into a project with real data.
+- **Website:** the Flutter app built for the web, prepared for Vercel (`apps/mobile/vercel.json`, root
+  directory `apps/mobile`, publishable key from Vercel's environment variables); steps in
+  [deployment.md](docs/architecture/deployment.md#website-vercel). Not deployed yet.
 - **Mobile:** Android release builds; iOS needs a macOS build host.
 - **Batch jobs:** `python -m sews_services.jobs score|recommend|outcomes|monitor|deliver|train` (one job per
   process, for any scheduler); where they run is an owner decision. `train` builds models from the institution's

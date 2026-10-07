@@ -1,4 +1,6 @@
 abstract final class Routes {
+  /// The site root on the web (where auth links return); always moved on from.
+  static const String root = '/';
   static const String splash = '/splash';
   static const String login = '/login';
   static const String register = '/register';
@@ -32,6 +34,7 @@ abstract final class Routes {
   /// Entry/transition screens a signed-in, onboarded student is moved away from.
   static const Set<String> gateways = {
     ...public,
+    root,
     splash,
     onboarding,
     unsupportedRole,

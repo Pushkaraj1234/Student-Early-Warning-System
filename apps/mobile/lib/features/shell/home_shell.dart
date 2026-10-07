@@ -2,31 +2,60 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sews_mobile/core/data_providers.dart';
+import 'package:sews_mobile/core/layout/breakpoints.dart';
 import 'package:sews_mobile/core/routing/routes.dart';
 
-/// Bottom navigation for the four main sections.
+/// Navigation for the four main sections: a bottom bar on phones, a side rail on wider
+/// windows (tablets, desktop browsers) — see [Breakpoints.navigationRail].
 class HomeShell extends ConsumerWidget {
   const HomeShell({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
+  static const List<({IconData icon, String label})> _sections = [
+    (icon: Icons.dashboard_outlined, label: 'Home'),
+    (icon: Icons.school_outlined, label: 'Academics'),
+    (icon: Icons.event_available_outlined, label: 'Attendance'),
+    (icon: Icons.assignment_outlined, label: 'Assignments'),
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(notificationsRealtimeProvider);
-    return _scaffold();
+    return MediaQuery.sizeOf(context).width >= Breakpoints.navigationRail ? _withRail() : _withBottomBar();
   }
 
-  Widget _scaffold() => Scaffold(
+  void _select(int index) =>
+      navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
+
+  Widget _withBottomBar() => Scaffold(
         body: navigationShell,
         bottomNavigationBar: NavigationBar(
           selectedIndex: navigationShell.currentIndex,
-          onDestinationSelected: (index) =>
-              navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.dashboard_outlined), label: 'Home'),
-            NavigationDestination(icon: Icon(Icons.school_outlined), label: 'Academics'),
-            NavigationDestination(icon: Icon(Icons.event_available_outlined), label: 'Attendance'),
-            NavigationDestination(icon: Icon(Icons.assignment_outlined), label: 'Assignments'),
+          onDestinationSelected: _select,
+          destinations: [
+            for (final s in _sections) NavigationDestination(icon: Icon(s.icon), label: s.label),
+          ],
+        ),
+      );
+
+  Widget _withRail() => Scaffold(
+        body: Row(
+          children: [
+            SafeArea(
+              right: false,
+              child: NavigationRail(
+                selectedIndex: navigationShell.currentIndex,
+                onDestinationSelected: _select,
+                labelType: NavigationRailLabelType.all,
+                destinations: [
+                  for (final s in _sections)
+                    NavigationRailDestination(icon: Icon(s.icon), label: Text(s.label)),
+                ],
+              ),
+            ),
+            const VerticalDivider(width: 1),
+            Expanded(child: navigationShell),
           ],
         ),
       );

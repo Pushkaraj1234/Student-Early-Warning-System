@@ -23,6 +23,7 @@ import 'package:sews_mobile/features/onboarding/presentation/onboarding_screen.d
 import 'package:sews_mobile/features/profile/presentation/profile_screen.dart';
 import 'package:sews_mobile/features/risk/presentation/risk_explanation_screen.dart';
 import 'package:sews_mobile/features/shell/home_shell.dart';
+import 'package:sews_mobile/features/shell/not_found_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // Re-evaluate redirects whenever the auth state or the profile changes.
@@ -42,7 +43,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       location: state.matchedLocation,
       versionSupported: ref.read(appVersionSupportedProvider),
     ),
+    errorBuilder: (_, _) => const NotFoundScreen(),
     routes: [
+      // The top-level redirect moves every user on from the root (it is a gateway); this
+      // route only makes the address valid.
+      GoRoute(path: Routes.root, redirect: (_, _) => Routes.splash),
       GoRoute(path: Routes.splash, builder: (_, _) => const SplashScreen()),
       GoRoute(path: Routes.login, builder: (_, _) => const LoginScreen()),
       GoRoute(path: Routes.register, builder: (_, _) => const RegisterScreen()),

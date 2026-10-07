@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -41,11 +42,23 @@ void main() {
       expect(() => AppConfig.validate(url: 'https://x.supabase.co', key: _jwt({'role': 'service_role'})),
           throwsA(isA<ConfigException>()));
     });
+
+    test('auth links return to the site root on the web and to the deep link on mobile', () {
+      final page = Uri.parse('https://sews.example.org/mentor/students/s1?tab=2#x');
+      expect(AppConfig.authRedirectUrlFor(isWeb: true, page: page), 'https://sews.example.org/');
+      expect(AppConfig.authRedirectUrlFor(isWeb: true, page: Uri.parse('http://localhost:8080/login')),
+          'http://localhost:8080/');
+      expect(AppConfig.authRedirectUrlFor(isWeb: false, page: page), AppConfig.mobileAuthRedirectUrl);
+      // Tests run outside the browser, so the platform value is the mobile deep link.
+      expect(AppConfig.authRedirectUrl, 'io.sews.app://login-callback');
+    });
   });
 
   group('AppFailure mapping', () {
     test('network errors', () {
       expect(AppFailure.from(const SocketException('down')).kind, FailureKind.network);
+      expect(AppFailure.from(const HandshakeException('bad certificate')).kind, FailureKind.network);
+      expect(AppFailure.from(TimeoutException('slow')).kind, FailureKind.network);
       expect(AppFailure.from(http.ClientException('down')).kind, FailureKind.network);
       expect(AppFailure.from(AuthRetryableFetchException()).kind, FailureKind.network);
     });

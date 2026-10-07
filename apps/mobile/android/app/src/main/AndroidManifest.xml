@@ -27,7 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <!-- Supabase Auth redirects (email confirmation, password recovery). Must match
-                 AppConfig.authRedirectUrl and the project's allowed redirect URLs. -->
+                 AppConfig.mobileAuthRedirectUrl and the project's allowed redirect URLs. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>

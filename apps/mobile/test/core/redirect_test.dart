@@ -81,6 +81,14 @@ void main() {
     expect(go(AsyncError(Exception('offline'), StackTrace.empty)), isNull);
   });
 
+  test('the site root (where web auth links return) always moves on', () {
+    expect(_go(AuthStatus.unknown, Routes.root), Routes.splash);
+    expect(_go(AuthStatus.signedOut, Routes.root), Routes.login);
+    expect(_go(AuthStatus.passwordRecovery, Routes.root, _profile()), Routes.resetPassword);
+    expect(_go(AuthStatus.signedIn, Routes.root, _profile()), Routes.home);
+    expect(_go(AuthStatus.signedIn, Routes.root, _profile(role: 'mentor')), Routes.mentorHome);
+  });
+
   test('onboarded students go to the dashboard and can use app screens', () {
     expect(_go(AuthStatus.signedIn, Routes.login, _profile()), Routes.home);
     expect(_go(AuthStatus.signedIn, Routes.splash, _profile()), Routes.home);

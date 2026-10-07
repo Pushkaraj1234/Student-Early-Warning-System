@@ -8,6 +8,7 @@ provide. Environments and their safety rules: `docs/architecture/environments.md
 | Part | Runs on | State |
 |---|---|---|
 | Database, Auth, Realtime | Hosted Supabase (testing project `rzekfmfuskknadrchkhg`) | Live, synthetic data. Migration `20261002001200_rules_version.sql` still has to be pushed (see below). |
+| Website | Browser (the same Flutter app built for the web), to be hosted on Vercel | Release build verified locally against the testing project with the production headers (2026-10-05); **not deployed** (owner: Vercel account, see below). |
 | Mobile app | Android phones (Flutter) | Debug and release APKs build; release is signed with the debug key until the owner adds an upload key. |
 | Batch jobs (scoring, recommendations, outcomes, monitoring, notification delivery) | Any machine with Python 3.13 and network access to the database | Runnable through `python -m sews_services.jobs`; **not scheduled anywhere yet** (owner decision). |
 | Inference API (FastAPI) | Any container/VM host | Tested locally; **not deployed** (owner decision). |
@@ -56,6 +57,44 @@ Any of these works because each job is one short process; all need the database 
 | A cloud scheduler + container job | Most robust; most setup. |
 
 Not chosen on the owner's behalf: it decides where student data is processed and who holds the database secret.
+
+## Website (Vercel)
+
+The website is the Flutter app built for the browser (`apps/mobile/web/`). There is one codebase: the same
+screens, the same Supabase project and the same Row Level Security; the Android app is built from the same
+code when needed. Wide windows get a side navigation rail and a centred 1200 px page; addresses are clean
+(`/mentor`, not `/#/mentor`).
+
+**Local preview** (verified 2026-10-05; serves `build/web` with the rewrite and headers from `vercel.json`):
+
+```bash
+cd apps/mobile
+flutter build web --release --csp --no-web-resources-cdn --dart-define-from-file=config/testing.local.json
+python tool/serve_web.py          # http://localhost:8080
+```
+
+**Deploying to Vercel (owner, not done yet):**
+
+1. Push the repository to GitHub, then in Vercel: *Add New → Project* and import it.
+2. Set **Root Directory** to `apps/mobile`. `apps/mobile/vercel.json` sets the build command
+   (`tool/vercel_build.sh`, which installs Flutter 3.41.4 because Vercel has none), the output folder
+   (`build/web`), the rewrite that lets every address load the app, and the security headers.
+3. Add the environment variables `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` (Production and Preview). The
+   build **refuses** a secret or service-role key: everything in a website can be read by every visitor.
+4. In Supabase: *Authentication → URL Configuration → Redirect URLs*, add the site's address with a trailing
+   slash (e.g. `https://<project>.vercel.app/`, plus any custom domain; `http://localhost:8080/` for the local
+   preview). Email-confirmation and password-reset links return there; an address that is not listed falls
+   back to the project's Site URL.
+5. If the Supabase project is ever served from a custom domain, add it to `connect-src` in the
+   Content-Security-Policy in `vercel.json`, otherwise the browser blocks the requests.
+
+Not verified yet: the build on Vercel's own build machines (the script ran end to end locally with an installed
+Flutter; the Flutter-install branch needs `git`, `curl` and `unzip` on the build image).
+
+Web-specific security notes: the session is kept in the browser's local storage (supabase_flutter's web
+default), so the Content-Security-Policy (only this site, Supabase and Google's font files may be contacted; no
+framing) is the main protection against script injection. Confirmation and reset links must be opened in the
+same browser that requested them (PKCE).
 
 ## Applying the pending migration (owner)
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sews_mobile/core/routing/app_router.dart';
 import 'package:sews_mobile/core/theme/app_theme.dart';
+import 'package:sews_mobile/core/widgets/wide_frame.dart';
 
 class SewsApp extends ConsumerWidget {
   const SewsApp({super.key});
@@ -13,6 +14,7 @@ class SewsApp extends ConsumerWidget {
         theme: AppTheme.light(),
         darkTheme: AppTheme.dark(),
         routerConfig: ref.watch(routerProvider),
+        builder: (_, child) => WideFrame(child: child ?? const SizedBox.shrink()),
       );
 }
 
