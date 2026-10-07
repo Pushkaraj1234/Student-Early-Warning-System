@@ -73,19 +73,24 @@ flutter build web --release --csp --no-web-resources-cdn --dart-define-from-file
 python tool/serve_web.py          # http://localhost:8080
 ```
 
-**Live site (deployed 2026-10-08): https://sews-web.vercel.app** — Vercel project `sews-web` (account
-`pushkaraj1234`), backed by the hosted **testing** project with synthetic accounts only. It was deployed as a
-prebuilt static site: built locally with the command above, then `build/web` plus a copy of `vercel.json`
-without `buildCommand`/`outputDirectory` uploaded with `npx vercel@latest deploy --prod` from a folder named
-`sews-web`. Verified after deploy: the page and a deep link (`/mentor`) return 200 with all security headers, the
-sign-in screen renders without console errors, and the browser may contact the Supabase project under the CSP.
-To redeploy: rebuild, recreate that folder, run `npx vercel@latest link --project sews-web --yes` in it once,
-then `npx vercel@latest deploy --prod`. The site is not connected to GitHub; pushes do not redeploy it until the
-repository is connected (steps below).
+**Live site: https://sews-web.vercel.app** — Vercel project `sews-web` (account `pushkaraj1234`), backed by the
+hosted **testing** project with synthetic accounts only. **Automatic deploys are on (2026-10-08):** the project
+is connected to this GitHub repository; every push to `main` builds and replaces the live site, and pushes to
+other branches get a preview address. A failed build leaves the previous site live. Build status and logs:
+Vercel dashboard → `sews-web` → Deployments.
 
-**Deploying from GitHub (automatic builds; not done yet):**
+Verified 2026-10-08 with a build of commit `0ea8699` on Vercel's machines: the script installed Flutter 3.41.4
+(the image has `git`, `curl` and `unzip`) and built in about 2 minutes; the live JavaScript contains the testing
+project's URL and publishable key; `/` and `/mentor` return 200 with the security headers; the sign-in screen
+renders. The Flutter SDK is not cached between builds, so each build installs it again (about 1 minute).
 
-1. Push the repository to GitHub, then in Vercel: *Add New → Project* and import it.
+Every push to `main` rebuilds the site, including documentation-only pushes. To skip those, set *Settings →
+Git → Ignored Build Step* to `git diff --quiet HEAD^ HEAD -- .` (with Root Directory `apps/mobile` this skips
+builds when nothing under `apps/mobile` changed).
+
+**Project settings (already applied to `sews-web`; repeat for a new project):**
+
+1. In Vercel: *Add New → Project* and import the GitHub repository.
 2. Set **Root Directory** to `apps/mobile`. `apps/mobile/vercel.json` sets the build command
    (`tool/vercel_build.sh`, which installs Flutter 3.41.4 because Vercel has none), the output folder
    (`build/web`), the rewrite that lets every address load the app, and the security headers.
@@ -98,8 +103,7 @@ repository is connected (steps below).
 5. If the Supabase project is ever served from a custom domain, add it to `connect-src` in the
    Content-Security-Policy in `vercel.json`, otherwise the browser blocks the requests.
 
-Not verified yet: the build on Vercel's own build machines (the script ran end to end locally with an installed
-Flutter; the Flutter-install branch needs `git`, `curl` and `unzip` on the build image).
+For the live site, step 4 means adding `https://sews-web.vercel.app/` (owner, in the Supabase dashboard).
 
 Web-specific security notes: the session is kept in the browser's local storage (supabase_flutter's web
 default), so the Content-Security-Policy (only this site, Supabase and Google's font files may be contacted; no
