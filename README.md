@@ -31,7 +31,8 @@ Details: [system-architecture.md](docs/architecture/system-architecture.md) ·
 [technology-decisions.md](docs/architecture/technology-decisions.md) ·
 [database-design.md](docs/database/database-design.md) ·
 [data-contract.md](docs/ml/data-contract.md) · [baseline-results-v1.md](docs/ml/baseline-results-v1.md) ·
-[results-v2.md](docs/ml/results-v2.md) · [fairness.md](docs/ml/fairness.md) ·
+[results-v2.md](docs/ml/results-v2.md) · [longitudinal-v3.md](docs/ml/longitudinal-v3.md) ·
+[external-datasets.md](docs/ml/external-datasets.md) · [fairness.md](docs/ml/fairness.md) ·
 [institutional-training.md](docs/ml/institutional-training.md) ·
 [deployment.md](docs/architecture/deployment.md) · [backups.md](docs/architecture/backups.md) ·
 [production-readiness.md](docs/production-readiness.md) ·
@@ -99,7 +100,7 @@ The local test cluster used here listens on port 54330 (`initdb` + `pg_ctl`, see
 | Layer | Command | Result (2026-10-02) |
 |---|---|---|
 | Database | `bash scripts/db/test-local.sh` | 12 migrations applied twice; 14 files, 390 assertions passed |
-| ML | `ml/.venv/Scripts/python -m pytest -c ml/pyproject.toml ml/tests` · `ruff check --config ml/pyproject.toml ml` · `mypy --config-file ml/pyproject.toml ml` | 139 passed · clean · clean |
+| ML | `ml/.venv/Scripts/python -m pytest -c ml/pyproject.toml ml/tests` · `ruff check --config ml/pyproject.toml ml` · `mypy --config-file ml/pyproject.toml ml` | 181 passed (2026-10-08) · clean · clean |
 | Services | `services/.venv/Scripts/python -m pytest -c services/pyproject.toml services/tests` · `ruff check --config services/pyproject.toml services` · `mypy --config-file services/pyproject.toml services/sews_services services/tests` | 130 passed (incl. tests against a rebuilt local DB) · clean · clean |
 | Mobile | `flutter analyze` · `flutter test` · `flutter build apk --debug` / `--release` | no issues · 109 passed · both built; the release APK launches on the emulator (signed with the debug key until the owner adds one) |
 | Website (2026-10-05) | `flutter analyze` · `flutter test` · `flutter build web --release --csp --no-web-resources-cdn` · `bash tool/vercel_build.sh` | no issues · 115 passed · built; runs in the browser under the production Content-Security-Policy (sign-in screen, clean addresses, deep links redirect to sign-in) |

@@ -103,16 +103,16 @@ as exploratory. Effects below |ΔPR-AUC| 0.01 or a false-alarm reduction below 0
 
 | Gantt stage (dates from the chart) | v3 deliverable | Status |
 |---|---|---|
-| Schema design & feature selection (11–18 Oct) | §1 gap analysis, §3 feature set | planned |
-| Data collection & cleaning (18 Oct–1 Nov) | OULAD (already validated, [week 5](week05-eda.md)); student-week panel builder + leakage guard | planned |
-| Feature engineering & aggregation (1–8 Nov) | `ml/longitudinal/panel.py` | planned |
-| Exploratory analysis & baselines (1–8 Nov) | panel description, Kaplan–Meier curves, prevalence and L1 baselines | planned |
-| Advanced prototyping — LSTM, XGBoost (8–22 Nov) | GRU / LSTM / TCN, XGBoost, RF, ensemble, hazard model | planned |
-| Refinement & cross-validation (15–22 Nov) | tuning on validation, rolling-origin CV, leave-one-module-out | planned |
-| Metrics & threshold tuning (15–29 Nov) | F2, cost thresholds, lead time, alert smoothing | planned |
-| Fairness & explainability (22 Nov–6 Dec) | subgroup audit, per-group thresholds, demographics sensitivity, SHAP, counterfactuals | planned |
+| Schema design & feature selection (11–18 Oct) | §1 gap analysis, §3 feature set | done 2026-10-06 |
+| Data collection & cleaning (18 Oct–1 Nov) | OULAD (already validated, [week 5](week05-eda.md)); student-week panel builder + leakage guard | done (guard passed at 6 weeks) |
+| Feature engineering & aggregation (1–8 Nov) | `ml/longitudinal/panel.py` | done |
+| Exploratory analysis & baselines (1–8 Nov) | panel description, Kaplan–Meier curves, prevalence and L1 baselines | done |
+| Advanced prototyping — LSTM, XGBoost (8–22 Nov) | GRU / LSTM / TCN, XGBoost, RF, ensemble, hazard model | done |
+| Refinement & cross-validation (15–22 Nov) | tuning on validation, rolling-origin CV, leave-one-module-out | done |
+| Metrics & threshold tuning (15–29 Nov) | F2, cost thresholds, lead time, alert smoothing | done |
+| Fairness & explainability (22 Nov–6 Dec) | subgroup audit, per-group thresholds, demographics sensitivity, SHAP, counterfactuals | done |
 | Stakeholder feedback (29 Nov–6 Dec) | needs mentors/guide — not something code can do | owner |
-| Prototype deployment & monitoring (6–20 Dec) | versioned artifacts, weekly batch scoring with alert policy, drift report; phase 2 below | planned |
+| Prototype deployment & monitoring (6–20 Dec) | versioned artifacts, weekly batch scoring with alert policy, drift report; phase 2 below | done (benchmark prototype, `ml/longitudinal/score.py`) |
 
 ## 6. Phase 2 (after v3, needs institutional data)
 
@@ -127,3 +127,4 @@ audited and approved through the existing model-approval workflow. Not started: 
 |---|---|---|
 | 2026-10-06 | Initial version, before any v3 code was run | — |
 | 2026-10-06 (before any result) | Feature count corrected: 18 longitudinal features (11 activity + 7 assessment), not 19 | Counting error; the list in §3 is unchanged |
+| 2026-10-08 | Status column updated after the run; results in [longitudinal-v3.md](../ml/longitudinal-v3.md) | — |
