@@ -16,7 +16,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 | 6 | Correlation, regression, hypothesis testing, performance metrics, validation | **done** (2026-10-03) | [week06-statistical-analysis.md](week06-statistical-analysis.md): 10 pre-registered tests, Holm-corrected, all supported; report `ml/reports/hypotheses-20261003T095318Z/`; code `ml/analysis/hypotheses.py` | — |
 | 7 | Prototype / proof of concept, version control, reproducibility, documentation | **done** | Mobile app and website, database, backend jobs, ML pipeline, in-app training; weekly longitudinal model ([longitudinal-v3.md](../ml/longitudinal-v3.md)) and two external benchmark datasets ([external-datasets.md](../ml/external-datasets.md)); GitHub repository; 130 + 181 + 115 automated tests; 390 database checks | — |
 | 8 | Technical writing: abstract, introduction, methodology, results, conclusion; IEEE references | **missing** | Technical docs exist, but no paper | IEEE-format paper (Overleaf template) — needs team names, college, guide (yours) |
-| 9 | Patent search, prior-art analysis, technology readiness level, commercialisation | **missing** | — | Prior-art search (Google Patents / WIPO / InPASS), TRL assessment, commercialisation note |
+| 9 | Patent search, prior-art analysis, technology readiness level, commercialisation | **done** (2026-10-08) | [week09-ipr-trl-commercialisation.md](week09-ipr-trl-commercialisation.md): IP options under Indian law, 6 verified patents + non-patent prior art, patentability (not recommended), TRL 4 with the path to 7, market, models, SWOT | InPASS / WIPO search, trademark clearance, licence decision (yours) |
 | 10 | Poster, presentation, demo, peer review and viva | **missing** | A working demo exists (app on the emulator) | Poster, slides, demo script, viva questions |
 
 ## Order of work from here
@@ -24,7 +24,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 1. ~~Week 4 — hypotheses~~ done 2026-10-03.
 2. ~~Week 5 — exploratory analysis~~ done 2026-10-03.
 3. ~~Week 6 — statistical tests~~ done 2026-10-03.
-4. Week 9 — prior-art and TRL (independent of the paper).
+4. ~~Week 9 — prior-art and TRL~~ done 2026-10-08.
 5. Week 8 — the paper, using the results of weeks 4–6.
 6. Week 10 — poster, slides and viva preparation from the paper.
 
