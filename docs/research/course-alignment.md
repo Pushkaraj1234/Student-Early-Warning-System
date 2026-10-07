@@ -15,7 +15,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 | 5 | Data cleaning, missing values, outliers, feature engineering, descriptive statistics, visualisation | **done** (2026-10-03) | [week05-eda.md](week05-eda.md); generated report with 9 tables and 5 charts (`ml/reports/eda-oulad-20261003T093048Z/`), code `ml/analysis/eda.py` | — |
 | 6 | Correlation, regression, hypothesis testing, performance metrics, validation | **done** (2026-10-03) | [week06-statistical-analysis.md](week06-statistical-analysis.md): 10 pre-registered tests, Holm-corrected, all supported; report `ml/reports/hypotheses-20261003T095318Z/`; code `ml/analysis/hypotheses.py` | — |
 | 7 | Prototype / proof of concept, version control, reproducibility, documentation | **done** | Mobile app and website, database, backend jobs, ML pipeline, in-app training; weekly longitudinal model ([longitudinal-v3.md](../ml/longitudinal-v3.md)) and two external benchmark datasets ([external-datasets.md](../ml/external-datasets.md)); GitHub repository; 130 + 181 + 115 automated tests; 390 database checks | — |
-| 8 | Technical writing: abstract, introduction, methodology, results, conclusion; IEEE references | **missing** | Technical docs exist, but no paper | IEEE-format paper (Overleaf template) — needs team names, college, guide (yours) |
+| 8 | Technical writing: abstract, introduction, methodology, results, conclusion; IEEE references | **done** (2026-10-08), placeholders for names | [IEEE conference paper](../paper/sews-ieee.tex) (IEEEtran, Overleaf-ready, 32 references, 1 table, 1 figure); [compile guide and submission checklist](../paper/README.md) | Fill in authors; verify the 11 method references; choose a venue (yours) |
 | 9 | Patent search, prior-art analysis, technology readiness level, commercialisation | **done** (2026-10-08) | [week09-ipr-trl-commercialisation.md](week09-ipr-trl-commercialisation.md): IP options under Indian law, 6 verified patents + non-patent prior art, patentability (not recommended), TRL 4 with the path to 7, market, models, SWOT | InPASS / WIPO search, trademark clearance, licence decision (yours) |
 | 10 | Poster, presentation, demo, peer review and viva | **done** (2026-10-08), placeholders for names | 16-slide deck with speaker notes ("SEWS final presentation" artifact); [week10-presentation-and-viva.md](week10-presentation-and-viva.md): talk plan, A1 poster layout, demo script, peer-review checklist, 16 viva questions with answers | Fill in names; share the deck; build and print the poster; rehearse (yours) |
 
@@ -25,7 +25,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 2. ~~Week 5 — exploratory analysis~~ done 2026-10-03.
 3. ~~Week 6 — statistical tests~~ done 2026-10-03.
 4. ~~Week 9 — prior-art and TRL~~ done 2026-10-08.
-5. Week 8 — the paper, using the results of weeks 4–6.
+5. ~~Week 8 — the paper~~ done 2026-10-08.
 6. ~~Week 10 — poster, slides and viva preparation~~ done 2026-10-08 (update after the paper).
 
 ## What the student/team must provide
