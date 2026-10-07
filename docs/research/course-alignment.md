@@ -17,7 +17,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 | 7 | Prototype / proof of concept, version control, reproducibility, documentation | **done** | Mobile app and website, database, backend jobs, ML pipeline, in-app training; weekly longitudinal model ([longitudinal-v3.md](../ml/longitudinal-v3.md)) and two external benchmark datasets ([external-datasets.md](../ml/external-datasets.md)); GitHub repository; 130 + 181 + 115 automated tests; 390 database checks | — |
 | 8 | Technical writing: abstract, introduction, methodology, results, conclusion; IEEE references | **missing** | Technical docs exist, but no paper | IEEE-format paper (Overleaf template) — needs team names, college, guide (yours) |
 | 9 | Patent search, prior-art analysis, technology readiness level, commercialisation | **done** (2026-10-08) | [week09-ipr-trl-commercialisation.md](week09-ipr-trl-commercialisation.md): IP options under Indian law, 6 verified patents + non-patent prior art, patentability (not recommended), TRL 4 with the path to 7, market, models, SWOT | InPASS / WIPO search, trademark clearance, licence decision (yours) |
-| 10 | Poster, presentation, demo, peer review and viva | **missing** | A working demo exists (app on the emulator) | Poster, slides, demo script, viva questions |
+| 10 | Poster, presentation, demo, peer review and viva | **done** (2026-10-08), placeholders for names | 16-slide deck with speaker notes ("SEWS final presentation" artifact); [week10-presentation-and-viva.md](week10-presentation-and-viva.md): talk plan, A1 poster layout, demo script, peer-review checklist, 16 viva questions with answers | Fill in names; share the deck; build and print the poster; rehearse (yours) |
 
 ## Order of work from here
 
@@ -26,7 +26,7 @@ Legend: **done** = exists and is verified · **partial** = exists but not in the
 3. ~~Week 6 — statistical tests~~ done 2026-10-03.
 4. ~~Week 9 — prior-art and TRL~~ done 2026-10-08.
 5. Week 8 — the paper, using the results of weeks 4–6.
-6. Week 10 — poster, slides and viva preparation from the paper.
+6. ~~Week 10 — poster, slides and viva preparation~~ done 2026-10-08 (update after the paper).
 
 ## What the student/team must provide
 
