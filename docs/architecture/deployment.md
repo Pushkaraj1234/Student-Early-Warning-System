@@ -73,7 +73,17 @@ flutter build web --release --csp --no-web-resources-cdn --dart-define-from-file
 python tool/serve_web.py          # http://localhost:8080
 ```
 
-**Deploying to Vercel (owner, not done yet):**
+**Live site (deployed 2026-10-08): https://sews-web.vercel.app** — Vercel project `sews-web` (account
+`pushkaraj1234`), backed by the hosted **testing** project with synthetic accounts only. It was deployed as a
+prebuilt static site: built locally with the command above, then `build/web` plus a copy of `vercel.json`
+without `buildCommand`/`outputDirectory` uploaded with `npx vercel@latest deploy --prod` from a folder named
+`sews-web`. Verified after deploy: the page and a deep link (`/mentor`) return 200 with all security headers, the
+sign-in screen renders without console errors, and the browser may contact the Supabase project under the CSP.
+To redeploy: rebuild, recreate that folder, run `npx vercel@latest link --project sews-web --yes` in it once,
+then `npx vercel@latest deploy --prod`. The site is not connected to GitHub; pushes do not redeploy it until the
+repository is connected (steps below).
+
+**Deploying from GitHub (automatic builds; not done yet):**
 
 1. Push the repository to GitHub, then in Vercel: *Add New → Project* and import it.
 2. Set **Root Directory** to `apps/mobile`. `apps/mobile/vercel.json` sets the build command
