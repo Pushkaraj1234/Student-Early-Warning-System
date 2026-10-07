@@ -1,0 +1,45 @@
+{
+  "run_name": "oulad-ts-v3",
+  "dataset": {
+    "name": "OULAD",
+    "path": "ml/data/raw/oulad",
+    "provenance": "benchmark",
+    "description": "Open University Learning Analytics Dataset (United Kingdom, 2013-2014; CC BY 4.0; UCI id 349). NOT Indian data."
+  },
+  "first_week": 1,
+  "last_week": 30,
+  "score_release_lag_days": 14,
+  "split": {
+    "train": ["2013B", "2013J"],
+    "validation": ["2014B"],
+    "test": ["2014J"]
+  },
+  "rolling_origin": [
+    {"train": ["2013B"], "test": ["2013J"]},
+    {"train": ["2013B", "2013J"], "test": ["2014B"]},
+    {"train": ["2013B", "2013J", "2014B"], "test": ["2014J"]}
+  ],
+  "lomo_train": ["2013B", "2013J", "2014B"],
+  "lomo_test": ["2014J"],
+  "leakage_check_weeks": [2, 4, 8, 13, 20, 30],
+  "xgb_search_settings": 12,
+  "sequence_grid": {
+    "kinds": ["gru", "lstm", "tcn"],
+    "hidden": [32, 64],
+    "dropout": [0.1, 0.3],
+    "max_epochs": 25,
+    "patience": 3
+  },
+  "mc_dropout_samples": 30,
+  "cost_ratios": [2, 5, 10],
+  "primary_cost_ratio": 5,
+  "risk_level_quantiles": [0.5, 0.75, 0.9],
+  "counterfactual_week": 8,
+  "counterfactual_sample": 300,
+  "explain_sample": 2000,
+  "bootstrap_resamples": 2000,
+  "random_seed": 20261006,
+  "cache_dir": "ml/data/processed",
+  "output_dir": "ml/artifacts",
+  "report_dir": "ml/reports"
+}
