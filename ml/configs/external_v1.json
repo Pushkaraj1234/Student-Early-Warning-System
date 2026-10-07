@@ -1,0 +1,23 @@
+{
+  "run_name": "external-v1",
+  "dropout": {
+    "path": "ml/data/raw/uci_dropout/data.csv",
+    "sha256": "3ef126de5cefff26eb11fbb4237f1a1401cb64b488e2f1d598c23cedeb4c45ae"
+  },
+  "performance_portuguese": {
+    "path": "ml/data/raw/uci_student_performance/student-por.csv",
+    "sha256": "a7594a11d7771c0efe1a740824e0e833da9c4cad07c39a9766a874575563fb3f"
+  },
+  "performance_math": {
+    "path": "ml/data/raw/uci_student_performance/student-mat.csv",
+    "sha256": "e47f9ee225e1ee6e69b7564e6dac7123e80b8486677fe111f351964cef5dec80"
+  },
+  "validation_share": 0.15,
+  "test_share": 0.15,
+  "xgb_search_settings": 12,
+  "bootstrap_resamples": 2000,
+  "cv_folds": 5,
+  "cv_repeats": 5,
+  "random_seed": 20261008,
+  "report_dir": "ml/reports"
+}
