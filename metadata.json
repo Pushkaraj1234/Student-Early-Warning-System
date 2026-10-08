@@ -1,0 +1,8 @@
+{
+  "name": "SEWS - Student Early Warning System",
+  "description": "Student Early Warning and Intervention System for identifying academic risk, explaining risk factors, and recommending targeted interventions.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

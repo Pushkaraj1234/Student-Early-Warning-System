@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-primary: #00696B;
+  }
+}
